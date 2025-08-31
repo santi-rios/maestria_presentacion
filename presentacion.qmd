@@ -1,0 +1,201 @@
+---
+title: "Análisis del Laberinto Acuático de Morris"
+subtitle: "Efectos de Fluoxetina y Estrés CUMS"
+author: "Tu Nombre"
+format: 
+  revealjs:
+    # theme: [default, custom.scss]
+    slide-number: true
+    chalkboard: true
+    preview-links: auto
+    logo: "images/logo.png"
+    footer: "Morris Water Maze Analysis"
+    transition: slide
+    background-transition: fade
+    highlight-style: github
+    code-fold: true
+    fig-align: center
+    incremental: false
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+source("R/results.R")
+```
+
+## Introducción {.center}
+
+::: {.fragment}
+### Protocolo Experimental
+- 4 días de entrenamiento
+- Prueba 1 (adquisición)  
+- Prueba 2 (retención)
+- 2 días entrenamiento reversa
+- Prueba 3 (reversa)
+:::
+
+::: {.fragment}
+### Grupos Experimentales
+- **Tratamiento**: Salina vs Fluoxetina
+- **Estrés**: Control vs CUMS
+:::
+
+# Fase de Entrenamiento
+
+## Latencias de Escape {.center}
+
+::: {.panel-tabset}
+
+### Estático
+```{r}
+#| label: fig-latencies-static
+#| fig-cap: "Latencias de escape durante el entrenamiento"
+
+print(latencies_plot)
+```
+
+### Animado
+
+![Progresión de latencias día a día](./plots/latencies_animated.gif)
+
+### Interactivo
+```r
+#| label: fig-latencies-interactive
+
+if (exists("interactive_latencies")) {
+  interactive_latencies
+}
+```
+
+:::
+
+## Estrategias de Búsqueda {.scrollable}
+
+```{r}
+#| label: fig-strategies
+#| fig-cap: "Estrategias utilizadas durante el entrenamiento"
+#| out-width: "100%"
+
+print(estrategias_plot)
+```
+
+::: {.notes}
+Las estrategias alocéntricas (dependientes del hipocampo) aumentan con el entrenamiento.
+:::
+
+# Pruebas de Memoria
+
+## Progresión de Resultados {.center}
+
+::: {.fragment .fade-in-then-semi-out}
+### Prueba 1: Adquisición
+```{r}
+#| label: fig-probe1
+#| fig-height: 6
+
+print(progressive_analyses[["P-1"]]$plot)
+```
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+### Prueba 2: Retención  
+```{r}
+#| label: fig-probe2
+#| fig-height: 6
+
+print(progressive_analyses[["P-2"]]$plot)
+```
+:::
+
+::: {.fragment .fade-in}
+### Prueba 3: Reversa
+```{r}
+#| label: fig-probe3
+#| fig-height: 6
+
+print(progressive_analyses[["P-Rev"]]$plot)
+```
+:::
+
+## Comparación Animada {.center}
+
+![Comparación entre todas las pruebas](./plots/probe_tests_comparison.gif)
+
+## Distancia al Objetivo {.scrollable}
+
+::: {.panel-tabset}
+
+### Prueba 1
+```{r}
+print(distance_analyses[["P-1"]]$plot)
+```
+
+### Prueba 2  
+```{r}
+print(distance_analyses[["P-2"]]$plot)
+```
+
+### Prueba 3
+```{r}
+print(distance_analyses[["P-Rev"]]$plot)
+```
+
+:::
+
+# Análisis Estadístico
+
+## Tablas ANOVA {.scrollable}
+
+::: {.panel-tabset}
+
+### Latencias
+```r
+latencies_table
+```
+
+### Zona P-1
+```r
+probe_tables[["P-1"]]
+```
+
+### Zona P-2
+```r
+probe_tables[["P-2"]]
+```
+
+### Zona P-Rev
+```r
+probe_tables[["P-Rev"]]
+```
+
+:::
+
+# Conclusiones
+
+## Hallazgos Principales {.incremental}
+
+- **Entrenamiento**: Fluoxetina mejoró las latencias en ratones con estrés
+- **Adquisición**: Diferencias sutiles entre grupos
+- **Retención**: Mantenimiento de la memoria
+- **Reversa**: Efectos más pronunciados de la fluoxetina
+
+::: {.fragment}
+### Implicaciones
+La fluoxetina muestra efectos protectores contra el deterioro cognitivo inducido por estrés crónico.
+:::
+
+## ¡Gracias! {.center}
+
+::: {.fragment}
+### Preguntas y Discusión
+:::
+
+::: {.fragment}
+*Análisis realizado con R y Quarto*
+:::

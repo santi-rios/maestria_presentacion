@@ -1,0 +1,39 @@
+project:
+  title: "Quarto rmarkdown presentacion"
+  type: website
+  output-dir: docs
+format:
+  html:
+    theme: cerulean
+    title: "Quarto rmarkdown presentacion"
+    type: website
+    output-dir: docs
+  revealjs:
+    title: Tesis
+    lang: es
+    embed-resources: false
+    title-slide-attributes: 
+      data-background-image: ./style/fondo_hd.png
+      data-background-size: contain
+    crossref: 
+      fig-title: Fig
+      fig-prefix: Fig
+      title-delim: ".-" 
+    toc: true
+    toc-depth: 1
+    toc-title: Contenido
+    transition: slide # fade/slide/convex/concave/zoom/none
+    progress: true
+    footnotes-hover: true
+    slide-number: true
+    crossrefs-hover: true
+    theme: "./style/custom.scss"
+    css: ./style/style.css
+author:
+  - name: Biól. Garcia Rios Santiago
+    affiliations:
+      - name: UNAM, Facultad de Ciencias, MAESTRÍA en Ciencias Biológicas
+        url: https://pcbiol.posgrado.unam.mx/
+institute: "Director de Tesis: Dr. Alonso Martínez Canabal"
+bibliography: zotero.bib
+csl: apa-slide-presentation

@@ -1,0 +1,989 @@
+---
+format: revealjs
+---
+
+```{r}
+source("./R/results.R")
+```
+
+# Trastornos de Ansiedad y Depresión
+
+## 
+
+::: {.r-stack}
+
+::: {.fragment .fade-in-then-out}
+
+```{r mental-health-plot}
+#| label: fig-depresionansiedad
+#| fig-cap: "*Fuente*: SECRETARÍA DE SALUD/DIRECCIÓN GENERAL DE INFORMACIÓN EN SALUD. Datos estimados al 31 de diciembre, 2023. [Enlace](http://sinaiscap.salud.gob.mx:8080/DGIS/)."
+
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(plotly)
+
+# 1. Digitize the data from the image
+data <- tibble(
+  Condicion = c(
+    "Demencias",
+    "Tras. del desarrollo Int.",
+    "Tras. de la Conducta",
+    "Tras. del Espectro",
+    "TDAH",
+    "Estrés Postraumático",
+    "Tras. Bipolar",
+    "Tras. Psicótico",
+    "Ansiedad",
+    "Depresión"
+  ),
+  Demanda_Total = c(1.0, 2.9, 7.0, 1.8, 3.7, 1.6, 1.4, 2.6, 52.8, 25.1),
+  Porcentaje_Mujer = c(
+    35.3,
+    47.3,
+    39.4,
+    22.1,
+    18.8,
+    66.7,
+    67.0,
+    45.7,
+    73.4,
+    78.8
+  ),
+  Porcentaje_Hombre = c(
+    64.6,
+    52.6,
+    60.5,
+    77.8,
+    81.1,
+    33.2,
+    32.9,
+    54.2,
+    26.5,
+    21.1
+  )
+) |>
+  # Add a column to highlight 'Depresión'
+  mutate(
+    Highlight = ifelse(
+      Condicion %in% c("Depresión", "Ansiedad"),
+      "Highlighted",
+      "Normal"
+    ),
+    # Create a custom text for the interactive tooltip
+    Tooltip_Text = paste0(
+      "<b>",
+      Condicion,
+      "</b>",
+      "<br><b>Demanda Total:</b> ",
+      Demanda_Total,
+      "%",
+      "<br><b>Distribución:</b>",
+      "<br>  Mujeres: ",
+      Porcentaje_Mujer,
+      "%",
+      "<br>  Hombres: ",
+      Porcentaje_Hombre,
+      "%"
+    )
+  )
+
+# 2. Create the static plot with ggplot2
+p <- ggplot(
+  data,
+  aes(
+    x = Demanda_Total,
+    y = reorder(Condicion, Demanda_Total),
+    fill = Highlight,
+    text = Tooltip_Text
+  )
+) +
+  geom_col(show.legend = FALSE) +
+  # geom_text(aes(label = paste0(Demanda_Total, "%")), hjust = -0.2, size = 3.5, fontface = "bold") +
+  scale_fill_manual(
+    values = c("Highlighted" = "#5b0083", "Normal" = "grey50")
+  ) +
+  scale_x_continuous(
+    limits = c(0, 60),
+    breaks = scales::pretty_breaks(n = 4),
+    expand = c(0, 0),
+    labels = scales::percent_format(accuracy = 1, scale = 1)
+  ) +
+  labs(
+    x = "",
+    y = "",
+    title = "Porcentaje de Demanda de Atención Psiquiátrica en México (SS/DGIS, MX)",
+    subtitle = "(2014-2023)"
+  ) +
+  theme_minimal(base_size = 16) +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    plot.title = element_text(face = "bold", size = 12),
+    plot.subtitle = element_text(size = 12, color = "grey30"),
+    axis.title.x = element_text(size = 10),
+    legend.position = "none",
+    # axis.text.y = element_text(angle = 40),
+    # plot.margin=unit(c(1,1,-1,-1), 'cm')
+  )
+
+# 3. Convert to an interactive plot with plotly
+# The `tooltip = "text"` argument tells plotly to use our custom text
+# ggplotly(p, tooltip = "text") %>% config(displayModeBar = FALSE)
+p
+```
+
+:::
+
+::: {.fragment .fade-in-then-out}
+
+```{r depresion-plot}
+#| label: fig-depresion
+#| fig-cap: "*Fuente*: SECRETARÍA DE SALUD/DIRECCIÓN GENERAL DE INFORMACIÓN EN SALUD. Datos estimados al 31 de diciembre, 2023. [Enlace](http://sinaiscap.salud.gob.mx:8080/DGIS/)."
+
+# Load necessary libraries
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(gganimate)
+# Read and clean the data
+depresion.df <- read.csv(
+  "./data/inegi_depresion_mexico.csv",
+  skip = 1,
+  header = TRUE
+) |>
+  janitor::clean_names()
+
+# Reshape data from wide to long format
+depresion_long <- depresion.df |>
+  # Select only the depression data row
+  filter(x == "Depresión") |>
+  # Pivot the data to a long format
+  pivot_longer(
+    cols = -x,
+    names_to = "variable",
+    values_to = "tasa"
+  ) |>
+  # Separate the 'variable' column into sex and year index
+  mutate(
+    sex = case_when(
+      grepl("hombres", variable) ~ "Hombres",
+      grepl("mujeres", variable) ~ "Mujeres",
+      grepl("total", variable) ~ "Total"
+    ),
+    # Extract the year index from the column name
+    year_index = as.integer(gsub(".*_", "", variable)),
+    # Handle columns without a number suffix (base year)
+    year_index = ifelse(is.na(year_index), 0, year_index)
+  ) |>
+  # Assuming the base year is 2010
+  mutate(year = 2014 + year_index) |>
+  # Clean up the dataframe
+  select(year, sex, tasa) |>
+  # Filter out the 'Total' category to avoid duplicating data in the plot
+  filter(sex != "Total")
+
+# Create the animated plot
+anim <- ggplot(
+  depresion_long,
+  aes(x = year, y = tasa, color = sex, group = sex)
+) +
+  geom_line(linewidth = 1.5) +
+  geom_point(size = 4) +
+  # geom_text(aes(label = round(tasa, 0)), vjust = -1.5, fontface = "bold") +
+  labs(
+    title = "Tasa de Depresión en México por sexo (DGIS, MX)",
+    subtitle = "Año: {round(frame_along)}",
+    x = "Año",
+    y = "Tasa por 100,000 habitantes",
+    color = "Sexo"
+  ) +
+  theme_minimal(base_size = 18) +
+  theme(
+    plot.title = element_text(face = "bold", size = 18, hjust = 0.5),
+    plot.subtitle = element_text(size = 16, hjust = 0.5),
+    legend.position = "top"
+  ) +
+  scale_color_manual(values = c("Hombres" = "#0072B2", "Mujeres" = "#b21c00")) +
+  # scale_x_continuous(breaks = scales::pretty_breaks(n = length(unique(depresion_long$year)))) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 5)) +
+  # gganimate functionality
+  transition_reveal(year) +
+  ease_aes('linear')
+
+# Display the animation, making it stop at the end
+animate(anim, fps = 15, renderer = gifski_renderer(loop = FALSE))
+```
+
+:::
+
+::: {.fragment}
+
+![El estrés crónico es uno de los principales factores que generan conductas de tipo **depresivas** y **ansiosas** en roedores [@willner1997] y humanos[@lupien2009]. Figura modificado de @ross2017](./Figures/ross2017.png){width="700px" #fig-estresconductas}
+
+:::
+
+:::
+
+# Efectos cognitivos de la depresión y ansiedad
+
+## {.smaller}
+
+::: {.fragment .data-build}
+
+Estos trastornos afectan cómo aprendemos, recordamos, planificamos y regulamos nuestras conductas para alcanzar metas [@girotti2024]
+
+:::
+
+:::: {.columns}
+
+::: {.column width="60%"}
+
+::: {.fragment .fade-in-then-semi-out}
+
+
+
+![La dificultad para adaptarse a nuevos problemas es un síntoma central en la depresión y ansiedad [@maramis2021]](./Figures/flexibilidad_cognitiva.png){width="350px"}
+
+:::
+
+:::
+
+::: {.column width="40%"}
+
+::: {.fragment .data-build}
+
+**Flexibilidad Cognitiva**: Habilidad mental que permite adaptar pensamientos y conductas en respuesta a las contingencias ambientales cambiantes [@uddin2021]
+
+:::
+
+:::
+
+::::
+
+
+## {.smaller}
+
+> La flexibilidad cognitiva surge de la interacción de múltiples redes neuronales que permiten ajustar los pensamientos y conductas ante cambios en el entorno   
+
+::: {.r-stack}
+
+![](./Figures/flexibilidad_cognitiva_mapa_1.png){.fragment}
+
+![](./Figures/flexibilidad_cognitiva_mapa_2.png){.fragment}
+
+![Adaptado de @dajani2015, @anacker2017 y @uddin2021](./Figures/flexibilidad_cognitiva_mapa_3.png){.fragment}
+
+:::
+
+
+# Hipocampo  
+
+## Anatomía y Función {.smaller}
+
+::: {layout-ncol=2}
+
+::: {.fragment .fade-in-then-semi-out}
+
+![Localización en el lóbulo temporal medial [@alvarez1994]](./Figures/hipocampo_caballo_v2.jpg){width="400px"}
+
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+
+![Esquema de la conectividad interna [@chen2024; @kesner2007]](./Figures/hipocampo_neuronas.png){width="250px"}
+
+:::
+
+:::
+
+::: {.fragment .fade-in}
+
+#### Estudios Fundacionales de su Función
+
+:::
+
+::: {layout-ncol=3}
+
+::: {.fragment .fade-in}
+
+**Memoria Episódica**
+
+![@scoville1957](./Figures/PatientHMBrain%20.png)
+
+:::
+
+::: {.fragment .fade-in}
+
+**Emoción**
+
+![@kluver1939](./Figures/kluver_bucy.jpg)
+
+:::
+
+::: {.fragment .fade-in}
+
+**Mapas Cognitivos**
+
+![@okeefe1979](./Figures/place_cells.jpg)
+
+:::
+
+:::
+
+## Consolidación y Valencia
+
+::: {.r-stack}
+
+::: {.fragment .fade-in-then-out}
+
+[1. Memoria de miedo contextual]{style="color: #008080;"}
+
+![Consolidación de Memoria [@kitamura2017; @goto2021]](./Figures/via_estres_1.png)
+
+:::
+
+::: {.fragment .fade-in-then-out}
+
+[2. Amígdala procesa la valencia y la Corteza Entorrinal el contexto [@roesler2021]]{style="color: #c55a11;"}
+
+![](./Figures/via_estres_2.png)
+
+:::
+
+::: {.fragment .fade-in-then-out}
+
+[3. Hipocampo-Amígdala-mPFC]{style="color: #7030a0;"}
+
+![La intercomunicación entre estas estructuras es crucial en cómo la memoria se consolida, evoca y se *reconsolida* [@lods2021; @goto2022]. Consecuentemente, tendrá efectos en el comportamiento asociado, como que el ratón se congele (respuesta de miedo) en un contexto específico (la caja donde recibió el choque) [@hernandez-mercado2022].](./Figures/via_estres_3.png)
+
+:::
+
+::: {.fragment}
+
+[4. El estrés puede promover los hábitos (*Cuerpo Estriado*) y quitarle agencia al individuo]{style="color: #c00000;"}
+
+![El estrés promueve la vía de la amígdala (CeA) y Cuerpo Estriado (DMS), asociada a la formación de hábitos, mientras que la ausencia de estrés promueve la vía BLA-DMS, asociada a conductas dirigidas a metas [@giovanniello2025]](./Figures/via_estres_1.png)
+
+:::
+
+:::
+
+
+## HIP-Estrés y Flexibilidad Cognitiva {.smaller}
+
+::: {.fragment .fade-in}
+
+![El hipocampo es una de las estructuras más afectadas por el estrés crónico [@treadway2015]. Esto se observa como una pérdida de volumen debido a una reducción en la neurogénesis hipocampal y atrofia dendrítica que afectan la plasticidad y dinámica hipocampal [@sheline1996; @steffens2000; @cobb2013; @huang2013]](./Figures/MRI_hipo.png){width="250px"}
+
+:::
+
+::: {.fragment .fade-in}
+
+![Como consecuencia, el estrés crónico impide el uso de conductas flexibles en una prueba dependiente del hipocampo (*Morris Water Maze*) [@vangerven2016; @morris1982]. Restaurar la plasticidad hipocampal restaura la capacidad de reaprender y ajustar las conductas cuando las condiciones ambientales cambian (*Flexibilidad Cognitiva*) [@garthe2009; @garthe2016]](./Figures/flexibilidad_balanza_completa.png){width="450px"}
+
+:::
+
+
+# Fármacos antidepresivos: Inhibidores Selectivos de la Recaptura de Serotonina (ISRS)
+
+##
+
+La fluoxetina puede mejorar síntomas emocionales en trastornos de depresión y ansiedad, así como prevenir la pérdida de volumen en el hipocampo causada por el estrés [@dulawa2004; @marwari2018]
+
+::: {layout-ncol=2}
+
+::: {.fragment .fade-in}
+
+![Mecanismo de acción inmediato de los ISRS](./Figures/ssri.png){width="450px" fig-align="center"}
+
+:::
+
+::: {.fragment .data-build}
+
+No está claro si este efecto protector se traduce en una mejora de la retención o actualización de una memoria espacial [@musaelyan2023; @liang2022; @neurogenesisdependent_david_2009; @bessa2009; @holick2008; @jett2017]
+
+:::
+
+:::
+
+
+# Objetivos {.center .unnumbered .unlisted auto-animate="true"}
+
+**General**: Evaluar el impacto de la fluoxetina en la memoria espacial de ratones sometidos a estrés crónico moderado impredecible.
+
+# Objetivos {.center .unnumbered .unlisted auto-animate="true" visibility="hidden"}
+
+**General**: Evaluar el impacto de la fluoxetina en la memoria espacial de ratones sometidos a estrés crónico moderado impredecible.
+
+<br>
+
+**Específico i**:  Determinar el **efecto del estrés crónico** sobre la retención de memoria espacial remota y la flexibilidad cognitiva en un aprendizaje reverso.
+
+# Objetivos {.center .unnumbered .unlisted auto-animate="true" visibility="hidden"}
+
+**General**: Evaluar el impacto de la fluoxetina en la memoria espacial de ratones sometidos a estrés crónico moderado impredecible.
+
+<br>
+
+**Específico i**:  Determinar el **efecto del estrés crónico** sobre la retención de memoria espacial remota y la flexibilidad cognitiva en un aprendizaje reverso.
+
+**Específico ii**: Determinar el **efecto de la fluoxetina** sobre la retención de memoria espacial remota y el aprendizaje reverso.
+
+# Objetivos {.center .unnumbered .unlisted auto-animate="true" visibility="hidden"}
+
+**General**: Evaluar el impacto de la fluoxetina en la memoria espacial de ratones sometidos a estrés crónico moderado impredecible.
+
+<br>
+
+**Específico i**:  Determinar el **efecto del estrés** crónico sobre la retención de memoria espacial remota y la flexibilidad cognitiva en un aprendizaje reverso.
+
+**Específico ii**: Determinar el **efecto de la fluoxetina** sobre la retención de memoria espacial remota y el aprendizaje reverso.
+
+**Específico iii**: Determinar si la fluoxetina es suficiente para aliviar las modificaciones a la **retención y flexibildad** de la memoria espacial causadas por el estrés cronico.
+
+# {#unifies-extends-1 .centered .unnumbered .unlisted data-menu-title="Hipótesis" background-color="#0F1620" auto-animate="true"}
+
+::: {style="margin-top: 150px; font-size: 3em; color: #75AADB;"}
+**Hipótesis**
+:::
+
+::: notes
+Quarto unifies & extends the R Markdown ecosystem.
+:::
+
+# {#unifies-extends-2 .centered .unnumbered .unlisted data-menu-title="Hipótesis" background-color="#0F1620" auto-animate="true"}
+
+::: {style="margin-top: 100px; font-size: 2.2em; color: #75AiADB"}
+**Hipótesis**
+:::
+
+<br>
+
+::: {.fragment .data-build}
+Si la fluoxetina puede aliviar los efectos emocionales negativos del estrés crónico, entonces podrá aliviar las modificaciones sobre la memoria remota espacial y la flexibilidad cognitiva.
+:::
+
+# Material y Métodos {.unnumbered .unlisted}
+
+:::: {style="background-color: #ffffff; color: black; border-radius: 1px; padding: 1px;"}
+
+::: {.panel-tabset}
+
+### Diseño
+
+![*n*: Salina = 19 , Fluoxetina = 16](./Figures/diseno_experimental.png){width="700px"}
+
+### MWM
+
+::: {layout="[0.35, 0.65]"}
+
+![](./Figures/WM_medidas.png)
+
+![](./Figures/wm_overview_2.png)
+
+:::
+
+### Estrés
+
+![Estresores utiliados en el protocolo de estrés crónico moderado e impredecible (*CUMS* por sus síglas en inglés). Protocolo basado en @monteiro2015](./Figures/cums.png){width="450px"}
+
+### Estadística
+
+- **ANOVA de medidas repetidas (diseño mixto)**: *Factores entre sujetos* (Tratamiento: Salina/Fluoxetina; Estrés: Sin/CUMS) y *dentro de sujetos* (tiempo, cuadrante/zona). Corrección Greenhouse–Geisser y comparaciones *post hoc* (Holm-Bonferroni).
+- **Modelos lineales mixtos**: interacción prueba × tratamiento × estrés
+- **Regresión de Poisson de efectos mixtos**: frecuencia de estrategias según tratamiento, estrés y tiempo.
+
+> Nivel de significancia: $p < 0.05$, tamaños de efecto con η².
+
+:::
+
+::::
+
+# Resultados y Discusión
+
+## Entrenamientos: Días 1-4 (previo a estrés) {.smaller}
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+**Latencias de Escape**: Tiempo que tardan los sujetos en encontrar la plataforma escondida (tiempo máximo: 60 segundos).
+
+::: {.panel-tabset}
+
+### Gráfico
+
+<!-- ![](./Chapters/5Resultados_files/figure-html/fig-latenciasPre-1.png) -->
+
+```{r}
+latencies_plot
+```
+
+### ANOVA
+
+```{r}
+latencies_table
+```
+
+### Explicación
+
+El ANOVA Mixto sugiere que no existe una interacción significativa entre `Tiempo x Tratamiento x Estrés (F(3, 72) = 0.66, p = 0.577)`. 
+- Esto sugiere que no hay diferencias significativas en la latencia de escape entre los grupos de tratamiento y estrés durante la fase de entrenamiento (previo al estrés crónico).
+
+:::
+
+:::
+
+::: {.column width="60%"}
+
+**Estrategias de búsqueda**: Patrones de movimiento que el sujeto usa para localizar la plataforma escondida. Se dividen [@garthe2013] en estrategias *Egocéntricas* (basadas en la relación de la plataforma con respecto al cuerpo del individuo) y *Alocéntricas* (relación de la plataforma con respecto a su relación espacial con el entorrno), dependientes del hipocampo [@grech2018].
+
+::: {.panel-tabset}
+
+### Gráfico
+
+![](./Chapters/5Resultados_files/figure-html/fig-estrategiasPre-1.png){#fig-estrategiasPrepresentacion}
+
+### Descripción
+
+regresión de Poisson con efectos mixtos (utilizando máxima verosimilitud)
+- variable de respuesta es el número de tipo de estrategias
+- las variables predictoras son el tiempo y tratamiento
+- Se incluyeron a los ratones como efectos mixtos
+
+- Interacción entre `Tratamiento x Estres x Estrategia` (alocéntrica, egocéntrica) no fue significativo 
+  - Prueba de razón de verosimilitud `𝑋 2 (4) = 5.127, 𝑝 = 0.274`
+- Interacción `Tiempo x Estrategia` es significativa 
+  - Prueba de razón de verosimilitud `𝑋 2 (1) = 26.125, 𝑝 < 0.001`
+    - Esto sugiere que el uso de estrategias cambia a lo largo del tiempo, independientemente del tratamiento y el estrés.
+
+### Discusión
+
+- Hipocampo desempeña un papel crucial en el aprendizaje espacial **alocéntrico** [@eichenbaum1999]
+
+:::
+
+:::
+
+::::
+
+::: footer
+
+![](./Figures/diseno_footer_E1.jpg){width=40%}
+
+:::
+
+
+## Entrenamientos Aprendizaje Reversa (post estrés)
+
+:::: {.columns}
+
+::: {.column width="40%"}
+
+**Latencias de Escape**
+
+::: {.panel-tabset}
+
+### Gráfico
+
+<!-- ![](./Chapters/5Resultados_files/figure-html/fig-latenciasPre-1.png) -->
+
+```{r}
+latencies_reversa_plot
+```
+
+### ANOVA
+
+![](./Figures/latencias_rev_tabla.png){fig-align="center"}
+
+### Explicación
+
+El ANOVA Mixto sugiere que no existe una interacción significativa entre `Tiempo x Tratamiento x Estrés (F(3, 72) = 0.66, p = 0.577)`. 
+- Esto sugiere que no hay diferencias significativas en la latencia de escape entre los grupos de tratamiento y estrés durante la fase de entrenamiento (previo al estrés crónico).
+
+:::
+
+:::
+
+::: {.column width="60%"}
+
+**Estrategias**
+
+::: {.panel-tabset}
+
+### Gráfico
+
+![](./Chapters/5Resultados_files/figure-html/fig-estrategiasPost-1.png){#fig-estrategiasPostpresentacion}
+
+### Descripción
+
+regresión de Poisson con efectos mixtos (utilizando máxima verosimilitud)
+- variable de respuesta es el número de tipo de estrategias
+- las variables predictoras son el tiempo y tratamiento
+- Se incluyeron a los ratones como efectos mixtos
+
+- Interacción entre `Tratamiento x Estres x Estrategia` (alocéntrica, egocéntrica) no fue significativo 
+  - Prueba de razón de verosimilitud `𝑋 2 (4) = 5.127, 𝑝 = 0.274`
+- Interacción `Tiempo x Estrategia` es significativa 
+  - Prueba de razón de verosimilitud `𝑋 2 (1) = 26.125, 𝑝 < 0.001`
+    - Esto sugiere que el uso de estrategias cambia a lo largo del tiempo, independientemente del tratamiento y el estrés.
+
+### Discusión
+
+- Hipocampo desempeña un papel crucial en el aprendizaje espacial **alocéntrico** [@eichenbaum1999]
+
+:::
+
+:::
+
+::::
+
+::: footer
+
+![](./Figures/diseno_footer_E2.jpg){width=30%}
+
+:::
+
+## Comparación entre Pruebas {.center}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+::: {.r-stack}
+
+::: {.fragment fragment-index=1 .fade-in-then-out}
+![](./plots/probe_test_P-1.png)
+:::
+
+::: {.fragment fragment-index=2 .fade-in-then-out}
+![](./plots/probe_test_P-2.png)
+:::
+
+::: {.fragment fragment-index=3 .fade-in-then-out}
+![](./plots/probe_test_P-Rev.png)
+:::
+
+::: {.fragment fragment-index=4}
+![](./Chapters/5Resultados_files/figure-html/fig-distanciaMedia-1.png)
+:::
+
+:::
+
+:::
+
+::: {.column width="50%"}
+
+::: {.r-stack}
+
+::: {.fragment fragment-index=1 .fade-in-then-out}
+
+```{r}
+probe_tables[["P-1"]]
+```
+
+:::
+
+::: {.fragment fragment-index=2 .fade-in-then-out}
+```{r}
+probe_tables[["P-2"]]
+```
+:::
+
+::: {.fragment fragment-index=3 .fade-in-then-out}
+```{r}
+probe_tables[["P-Rev"]]
+```
+:::
+
+::: {.fragment fragment-index=4}
+![](./plots/probe_tests_comparison.gif)
+:::
+
+:::
+
+:::
+
+::::
+
+::: {.r-stack}
+
+::: {.fragment fragment-index=1 .fade-in-then-out}
+![](./Figures/mapa_calor_p1.png)
+:::
+
+::: {.fragment fragment-index=2 .fade-in-then-out}
+![](./Figures/mapa_calor_p2.png)
+:::
+
+::: {.fragment fragment-index=3 .fade-in-then-out}
+![](./Figures/mapa_calor_pRev.png)
+:::
+
+::: {.fragment fragment-index=4}
+placeholder
+:::
+
+:::
+
+
+## Evolución de la Memoria Espacial {.unnumbered .unlisted .smaller}
+
+::: {layout="[45, -5, 45]"}
+
+![](./Chapters/5Resultados_files/figure-html/fig-distanciaMedia-1.png){#fig-distanciaMediainteraccion}
+
+![](./Chapters/5Resultados_files/figure-html/fig-entropiatodos-1.png)
+
+:::
+
+Distancia media y entropía son mejores métricas para evaluar el aprendizaje espacial [@maei2009; @maei2009a]
+
+## Entropía {.unnumbered .unlisted .smaller}
+
+::: {.panel-tabset}
+
+### Figuras
+
+::: {layout="[45, -5, 45]"}
+
+![](./Figures/entropia.gif)
+
+![https://santi-rios.github.io/maestria_app_water_maze/](./Figures/entropia_app_1.jpg)
+
+:::
+
+### Validación
+
+::: {layout="[45, -5, 45]"}
+
+![](./Chapters/5Resultados_files/figure-html/fig-entropialineplotcomps-1.png)
+
+
+![](./Chapters/5Resultados_files/figure-html/fig-entropialatman-1.png)
+
+:::
+
+:::
+
+# Discusión {.unnumbered .unlisted}
+
+## Efecto principal del estrés {.unnumbered .unlisted}
+
+:::: {style="background-color: #ffffff; color: black; border-radius: 1px; padding: 1px;"}
+
+::: {.fragment .fade-in-then-semi-out}
+
+El **estrés** afectó negativamente la flexibilidad cognitiva en el {{< acr MWM >}} (@fig-latenciasPostPresentacion, @fig-distanciaMediainteraccion)
+
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+
+La perseverancia [@fig-estrategiasPostpresentacion] se relaciona con la integridad del hipocampo y su capacidad de actualizar información [@garthe2016; @amelchenko2023a; @amelchenko2023]
+
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+
+Hipocampo desempeña un papel crucial en el aprendizaje espacial **alocéntrico** [@eichenbaum1999]
+
+:::
+
+::: {.fragment .fade-in-then-semi-out}
+
+El estrés crónico afecta negativamente la función cognitiva dependiente del hipocampo [@belleau2019], disminuyendo la {{< acr NHA >}} y causando atrofia dendrítica [@dealcubierre2023; @kino2015].
+
+:::
+
+::::
+
+## Mecanismo {.unnumbered .unlisted}
+
+::: {style="background-color: #ffffff; color: black; border-radius: 10px; padding: 5px;"}
+
+::: {.panel-tabset}
+
+### thp2
+
+![@hornung2003; @waselus2011; @alenina2015; @levinson2023](./Figures/tph2_estres.png){width="50%"}
+
+### Receptores de serotonina
+
+![@hornung2003; @waselus2011; @alenina2015; @levinson2023](./Figures/neurogenesis.png){width="50%"}
+
+### Sistema
+
+![@hornung2003; @waselus2011; @alenina2015; @levinson2023](./Figures/raphe.png){width="50%"}
+
+### mecanismo
+
+![@hornung2003; @waselus2011; @alenina2015; @levinson2023](./Figures/ssri.png){width="50%"}
+
+::: 
+
+:::
+
+## Efecto principal del tratamiento con fluoxetina {.unnumbered .unlisted}
+
+:::: {style="background-color: #ffffff; color: black; border-radius: 1px; padding: 1px;"}
+
+::: {.fragment .annotate}
+
+La [fluoxetina]{style="color: red;"} facilitó el reaprendizaje en el {{< acr MWM >}}, independientemente del [estrés]{style="color: red; background-color: yellow;"} (@fig-latenciasPostPresentacion, @fig-distanciaMediainteraccion)
+
+:::
+
+::: {.fragment .spotlight}
+
+Mejora en la flexibilidad cognitiva (actualizar memorias y adaptarse a cambios) [@marwari2018]
+
+:::
+
+::: {.fragment .spotlight}
+
+{{<acr ISRS>}} promueven la plasticidad sináptica en regiones clave para la memoria y regulación emocional ({{<acr mPFC>}}, {{< acr GD >}})
+
+:::
+
+::::
+
+## Mecanismo {{<acr NHA>}}
+
+::: {style="background-color: #ffffff; color: black; border-radius: 10px; padding: 5px;"}
+
+::: {.panel-tabset}
+
+### Inhibición
+
+![@kempermann2018](./Figures/neurogenesis_inhibicion.png){#fig-nhainhibicion width="50%"}
+
+### Separación de Patrones
+
+![@kempermann2018](./Figures/neurogenesis_separacion_patrones.png){#fig-nhaseparacion width="50%"}
+
+### Olvido
+
+![@toni2007; @toni2011: @toni2015](./Figures/neurogenesis_olvido.png){#fig-nhaolvido width="50%"}
+
+:::
+
+:::
+
+## Contribuciones para el análisisis de datos {.unnumbered .unlisted}
+
+:::: {style="background-color: #ffffff; color: black; border-radius: 1px; padding: 1px;"}
+
+::: {.fragment .data-build}
+
+Utilizar métricas más sensibles a la función hipocampal y la flexibilidad cognitiva (distancia media, entropía, estrategias de búsqueda) [@garthe2013; @hernandez-mercado2022; @maei2009].
+
+:::
+
+::: {.fragment .data-build}
+
+Se utilizó una nueva regresión de Poisson (@fig-estrategiasPrepresentacion, @fig-estrategiasPostpresentacion) para modelar estrategias (*egocéntricas, alocéntricas y perseverantes*), ofreciendo un análisis más detallado que los enfoques tradicionales [@amelchenko2023].
+
+:::
+
+::: {.fragment .data-build}
+
+  Este modelado confirmó la transición de estrategias egocéntricas a alocéntricas, dependientes del hipocampo
+
+:::
+
+::::
+
+## Limitaciones y Futuras Direcciones {.unnumbered .unlisted .smaller}
+
+:::: {style="background-color: #ffffff; color: black; border-radius: 1px; padding: 1px;"}
+
+::: {.fragment .spotlight}
+
+*Susceptibilidad de la Cepa de Ratones*: Se utilizó una cruza de ratones muy susceptible al estrés [@corder2023; @palumbo2009], lo que pudo influir en que el grupo control (`salina sin CUMS`) mostrara deficiencias en el reaprendizaje, similares al grupo con estrés (@fig-latenciasPostPresentacion, @fig-zonainteraccion, @fig-distanciaMediainteraccion). 
+
+:::
+
+::: {.fragment .spotlight}
+
+  - Dificultad para separar claramente los efectos del tratamiento (fluoxetina) de los del protocolo de estrés (CUMS) y de las propias inyecciones [@dupreez2020; @drude2011; @zamora-gonzalez2013].
+
+:::
+
+::: {.fragment .spotlight}
+
+*Duración del Tratamiento*: El estudio se enfocó en efectos a corto/mediano plazo, mientras que el uso clínico de antidepresivos es prolongado [@block2007].
+
+:::
+
+::: {.fragment .spotlight}
+
+*Ausencia de Análisis Histológicos*. Sugerencia Futura: Incluir análisis histológicos para evaluar NHA (BrdU, DCX, NeuN, etc.) y su relación con la flexibilidad cognitiva [@olpe2023].
+
+:::
+
+::::
+
+# Conclusiones {.unnumbered .unlisted .smaller}
+
+## Fluoxetina y Flexibilidad Cognitiva {.unnumbered .unlisted .smaller}
+
+::: {style="background-color:rgb(180, 230, 244); color: black; border-radius: 10px; padding: 5px;"}
+
+::: {.fragment .spotlight}
+
+La fluoxetina mejora la flexibilidad cognitiva en ratones, facilitando el reaprendizaje (aprendizaje reversa) en el {{<acr MWM>}}, especialmente en un modelo de estrés crónico.
+
+:::
+
+::: {.fragment .spotlight}
+
+Los ratones tratados con fluoxetina, incluso bajo estrés, se adaptaron mejor a cambios ambientales y cometieron menos errores al reaprender.
+  - Esto sugiere una restauración de funciones dependientes del hipocampo.
+
+:::
+
+:::
+
+## Impacto del Estrés Crónico {.unnumbered .unlisted .smaller}
+
+::: {style="background-color:rgb(255, 41, 41); color: black; border-radius: 10px; padding: 5px;"}
+
+::: {.fragment .data-build}
+
+El estrés crónico afecta negativamente la capacidad de reaprendizaje y disminuye la flexibilidad cognitiva.
+
+:::
+
+
+::: {.fragment .data-build}
+
+El tratamiento con fluoxetina previno esta disfunción en los animales estresados.
+
+:::
+
+:::
+
+. . .
+
+::: {style="background-color: #ffffff; color: black; border-radius: 10px; padding: 5px;"}
+
+::: {.fragment .annotate}
+
+La *fluoxetina* favorece la *flexibilidad cognitiva* espacial dependiente del hipocampo, tanto en animales control como en aquellos sometidos a estrés crónico.
+
+:::
+
+:::
+
+
+# Fin
+
+![](./Figures/tony_soprano_prozac_test.jpg){.r-stretch fig-align="center"}
+
+# Literatura Citada {.unnumbered .unlisted}
+
+::: {#refs}
+:::
