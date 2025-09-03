@@ -1,0 +1,10 @@
+## Planteamiento del Problema
+
+\todo{Agregar sección de planteamiento del problema para definir más claro y con calma el problema específico de la investigación.}
+
+La flexibilidad cognitiva, una capacidad esencial para la función ejecutiva [@uddin2021], permite a las personas adaptarse a nuevas situaciones y manejar cambios en su entorno [@anacker2017]. Sin embargo, en trastornos depresivos y de ansiedad, esta habilidad se ve comprometida [@guler2022], impidiendo que los individuos lleven una vida normal. Aunque se sabe que el volumen del hipocampo se reduce en individuos con depresión [@sheline1996] y que los antidepresivos pueden revertir parcialmente esta alteración [@boldrini2009], la relación entre estos fenómenos y la flexibilidad cognitiva sigue siendo un área de investigación activa [@rossi2016].
+
+El estrés crónico ha sido identificado como un factor que afecta negativamente al \ac{gd} [@conrad2008], induce comportamientos de tipo ansiosos y depresivos [@willner2017] y desregula el sistema serotoninérgico [@lages2021]. Aunque la fluoxetina ha demostrado mejorar los síntomas depresivos [@dulawa2004], los estudios actuales no se han enfocado en evaluar su efecto en la flexibilidad cognitiva mediada por el hipocampo [@marwari2018].
+
+Este estudio utiliza el \ac{mwm} para evaluar de manera más directa cómo la fluoxetina impacta la flexibilidad cognitiva mediada por el hipocampo en ratones bajo \ac{cums}. El objetivo es entender si la fluoxetina puede revertir o mitigar las alteraciones en la memoria espacial y la flexibilidad cognitiva causadas por el estrés. 
+

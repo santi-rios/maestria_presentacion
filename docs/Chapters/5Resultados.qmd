@@ -1,0 +1,3128 @@
+# Resultados {#sec-resultados}
+
+```{r setup}
+#| label: setup
+
+library(tidyverse)
+# library(vtable) # summ statistics
+# library(moments) # Load the moments package for skew/kurtosis
+# library(ggthemes)
+library(ggprism)
+library(gghighlight)
+library(ggpattern)
+# library(BlandAltmanLeh)
+# library(patchwork)
+# Specify the file paths
+# plots
+# library(gridExtra)
+# library(grid)
+# library(plotly)
+# # library(viridis)
+# library(viridisLite)
+library(patchwork)
+# library(hexbin)
+
+
+# # Bayes
+# library(brms)
+# library(modelbased)
+# library(see)
+# library(bayesplot)
+# library(bayestestR)
+
+
+# # Regresión
+# library(lme4)
+# library(emmeans)
+# library(modelr)
+# library(sjPlot)
+# library(gtsummary)
+# library(performance)
+# library(ggeffects)
+library(lmerTest)
+library(interactions)
+library(emmeans)
+
+library(kableExtra)
+
+# # Tablas
+# library(flextable)
+# library(webshot)
+# library(report)
+
+# # Estadística
+# library(rstatix)
+# library(ggpubr)
+
+```
+
+
+```{r dfsetup}
+
+# library(dplyr)
+# library(readr)
+
+# Define file paths
+file_paths <- c("../data/df_wm_clean_final_v2.csv", "./data/df_wm_clean_final_v2.csv")
+
+# Try loading the first available file
+df_wm <- NULL
+for (path in file_paths) {
+  if (file.exists(path)) {
+    df_wm <- read.csv(path)
+    break
+  }
+}
+
+# If no file is found, raise an error
+if (is.null(df_wm)) {
+  stop("CSV file not found in the specified paths.")
+}
+
+# Data transformation
+df_wm <- df_wm %>%
+  # Recode variables and create new columns
+  mutate(
+    Tratamiento.Farm = case_when(
+      tratamientos %in% c("Flx", "Flx-CUMS") ~ "Fluoxetina",
+      tratamientos %in% c("Sal-CUMS-F", "Salina-Control") ~ "Salina"
+    ),
+    Estres = case_when(
+      tratamientos %in% c("Flx-CUMS", "Sal-CUMS-F") ~ "CUMS",
+      tratamientos %in% c("Flx", "Salina-Control") ~ "Control"
+    ),
+    zona_blanco = case_when(
+      prueba %in% c("P-1", "P-2") ~ zona_ne,
+      prueba == "P-Rev" ~ zona_so
+    ),
+    zona_reversa = case_when(
+      prueba %in% c("P-1", "P-2") ~ zona_so,
+      prueba == "P-Rev" ~ zona_ne
+    ),
+    distancia_media_blanco = case_when(
+      prueba %in% c("P-1", "P-2") ~ distancia_annulus_ne,
+      prueba == "P-Rev" ~ distancia_annulus_so
+    ),
+    distancia_media_opuesto = case_when(
+      prueba %in% c("P-1", "P-2") ~ distancia_annulus_so,
+      prueba == "P-Rev" ~ distancia_annulus_ne
+    ),
+    Blanco = case_when(
+      prueba %in% c("P-1", "P-2") ~ cuadrante_ne,
+      prueba == "P-Rev" ~ cuadrante_so
+    ),
+    Opuestos = (cuadrante_no + cuadrante_se + cuadrante_so) / 3,
+    
+    # Convert variables to factors
+    tratamientos = factor(tratamientos, levels = c("Flx", "Flx-CUMS", "Salina-Control", "Sal-CUMS-F")),
+    id = factor(id),
+    stage = factor(stage),
+    prueba = factor(prueba),
+    Tratamiento.Farm = factor(Tratamiento.Farm),
+    Estres = factor(Estres)
+  )
+
+# Filter the data and rename columns
+df_wm_flx <- df_wm %>%
+  filter(tratamientos %in% c("Flx", "Flx-CUMS", "Sal-CUMS-F", "Salina-Control")) %>%
+  rename(tiempo_2 = tiempo, Tratamiento = Tratamiento.Farm, Tiempo = dia) %>%
+  droplevels() %>%
+  mutate(
+    # Recode factor levels for Tratamiento and Estres
+    Tratamiento = factor(Tratamiento, levels = c("Salina", "Fluoxetina")),
+    Estres = factor(Estres, levels = c("Control", "CUMS"), labels = c("NO-Estrés", "CUMS"))
+  )
+
+# quitar animales que no pasaron los 15 segundos
+# df_wm_flx %>%
+#   filter(str_detect(prueba, "P-1")) %>%
+#   dplyr::group_by(Tratamiento, Estres) %>%
+#   filter(Blanco < 15) %>%
+#   distinct(id)
+
+#   Tratamiento Estres    id    
+#   <fct>       <fct>     <fct> 
+# 1 Salina      NO-Estrés 6     
+# 2 Salina      NO-Estrés 9     
+# 3 Salina      CUMS      f_g3_3
+# 4 Salina      CUMS      f_g3_7
+
+df_wm_flx <- df_wm_flx %>%
+  filter(!id %in% c("6", "9", "f_g3_3", "f_g3_7"))
+
+```
+
+```{r dfestrategias}
+# library(dplyr)
+
+# Helper function to load data from multiple file paths
+load_data <- function(paths) {
+  for (path in paths) {
+    if (file.exists(path)) {
+      return(read.csv(path))
+    }
+  }
+  stop("CSV file not found in the specified paths.")
+}
+
+# Helper function to recode data
+recode_estrategias <- function(df) {
+  df %>%
+    mutate(
+      Tratamiento.Farm = case_when(
+        tratamiento %in% c("Flx", "Flx-CUMS") ~ "Fluoxetina",
+        tratamiento %in% c("Sal-CUMS-F", "Salina-Control") ~ "Salina"
+      ),
+      Estres = case_when(
+        tratamiento %in% c("Flx-CUMS", "Sal-CUMS-F") ~ "CUMS",
+        tratamiento %in% c("Flx", "Salina-Control") ~ "Control"
+      ),
+      estrategias_hipo = forcats::fct_recode(as.factor(estrategias_hipo), 
+        "Alocéntricas" = "hipocampo_dependientes",
+        "Egocéntricas" = "hipocampo_independientes",
+        "Perseverancia" = "perseverancia"
+    ),
+      Tratamiento.Farm = factor(Tratamiento.Farm, levels = c("Salina", "Fluoxetina"))
+    )
+}
+
+# File paths for pre and post data
+file_paths_pre <- c("../data/estrategias_pre_good_juntos.csv", "./data/estrategias_pre_good_juntos.csv")
+file_paths_post <- c("../data/estrategias_post_juntos.csv", "./data/estrategias_post_juntos.csv")
+
+# Load and recode pre data
+estrategias_df_pre <- load_data(file_paths_pre) %>%
+  recode_estrategias()
+
+# Load and recode post data
+estrategias_df_post <- load_data(file_paths_post) %>%
+  recode_estrategias()
+
+
+```
+
+
+```{r dfentropia}
+
+ entropia <- read.csv("../data/entropia_clean.csv") %>%
+  janitor::clean_names() %>%
+  filter(!str_detect(experimento, "Ket")) %>%
+  mutate(Tratamiento.Farm = case_when(
+        tratamiento %in% c("Flx", "Fluoxetina-CUMS") ~ "Fluoxetina",
+        tratamiento %in% c("Salina-CUMS-F", "Salina-Control") ~ "Salina"
+      ),
+        Estres = case_when(
+          tratamiento %in% c("Fluoxetina-CUMS", "Salina-CUMS-F") ~ "CUMS",
+          tratamiento %in% c("Flx", "Salina-Control") ~ "NO-Estrés"
+      ),
+        entropia_blanco = case_when(
+          stage %in% c("prueba_1", "prueba_2") ~ entropia_ne,
+          stage == "prueba_rev" ~ entropia_so
+    ),
+        dia = case_when(
+          stage == "prueba_1" ~ 1,
+          stage == "prueba_2" ~ 2,
+          stage == "prueba_rev" ~ 3
+  ),
+      Tratamiento.Farm = factor(Tratamiento.Farm, levels = c("Salina", "Fluoxetina"))
+  ) 
+
+
+```
+
+```{r funcionPlotsanova}
+
+# library(dplyr)
+# library(ggplot2)
+# library(rstatix)
+# library(ggpattern)  # For pattern-filled bars
+# library(ggthemes)
+# library(rlang)
+
+# Step 1: Prepare Data Function
+prepare_data <- function(df, test_filter, cols_to_pivot = NULL, names_to = "Preferencia", values_to = "Porcentaje") {
+  df_filtered <- df %>%
+    filter(str_detect(prueba, test_filter))
+  
+  # Check if test_filter contains "P-" and pivot the data if necessary
+  if (str_detect(test_filter, "P-") && !is.null(cols_to_pivot)) {
+    df_filtered <- df_filtered %>%
+      pivot_longer(
+        cols = all_of(cols_to_pivot),
+        names_to = names_to,
+        values_to = values_to,
+        values_drop_na = TRUE
+      )
+  }
+  
+  return(df_filtered)
+}
+
+# Step 2: Run ANOVA Test Function
+run_anova_test <- function(df, dv, id_col, within_col, between_cols, agrupar_variables = FALSE) {
+  if (agrupar_variables) {
+    # Summarize the data by grouping
+    df_summarized <- df %>%
+      dplyr::group_by(across(c(all_of(between_cols), id_col, within_col))) %>%
+      dplyr::summarise(respuesta = mean(!!rlang::sym(dv)), .groups = 'drop') %>%
+      ungroup()
+    
+    # Perform ANOVA on summarized data
+    anova_result <- df_summarized %>%
+      rstatix::anova_test(
+        dv = respuesta,
+        wid = !!sym(id_col),
+        within = !!sym(within_col),    
+        between = all_of(between_cols),
+        observed = all_of(within_col),
+        type = 3,
+        detailed = FALSE
+      )
+  } else {
+    # Perform ANOVA without summarization
+    anova_result <- df %>%
+      rstatix::anova_test(
+        dv = !!sym(dv),
+        wid = !!sym(id_col),
+        within = !!sym(within_col),    
+        between = all_of(between_cols),
+        observed = !!sym(within_col),
+        type = 3,
+        detailed = FALSE
+      )
+  }
+
+  # Extract the ANOVA table from the list
+  # anova_table <- anova_result$ANOVA # produce un dataframe
+  anova_table <- rstatix::get_anova_table(anova_result, correction = "auto")
+  # anova_table <- anova_table %>% select(!ends_with("05"))
+
+  # Check if the column 'p' exists, and if so, apply add_significance
+  if ("p" %in% colnames(anova_table)) {
+    anova_table <- anova_table %>%
+      rstatix::add_significance(
+        p.col = "p",
+        output.col = "valor.p",
+        cutpoints = c(0, 0.001, 0.01, 0.05, 1),
+        symbols = c("***", "**", "*", "ns")
+      ) %>%
+      rstatix::p_format(
+        accuracy = 0.001,
+        add.p = FALSE,
+        leading.zero = FALSE
+      )
+  } else {
+    warning("The 'p' column does not exist in the ANOVA result.")
+  }
+
+  # return(anova_table)
+}
+
+# Step 3: Create Plot Function
+create_plot <- function(df, y_var, treatment_var, facet_var, within_col, geom = "col_pattern",
+                        dodge_width = 0.85, x_lab_name, y_lab_name, hline_val, limy, 
+                        use_custom_y_scale = FALSE, anova_caption = NULL) {
+  
+  facet_formula <- as.formula(paste("~", facet_var))
+  
+  # Base plot setup: conditional aes mapping based on geom type
+  if (geom == "line") {
+    # Line plot: x mapped to within_col instead of interaction
+    plot <- ggplot(df, aes(x = !!sym(within_col), y = !!sym(y_var), group = !!sym(treatment_var), color = !!sym(treatment_var)))
+  } else {
+    # Bar plot with pattern: x mapped to interaction of variables
+    plot <- ggplot(df, aes(x = interaction(Preferencia, !!sym(treatment_var)), 
+                           y = !!sym(y_var), fill = !!sym(treatment_var)))
+  }
+
+  # Add different geoms based on the plot type
+  if (geom == "line") {
+    # Line plot: add lines and points
+    plot <- plot +
+      stat_summary(fun = "mean", geom = "line", position = position_dodge(width = 0.1), size = 1) +
+      stat_summary(fun = "mean", geom = "point", position = position_dodge(width = 0.1), size = 3) +
+      stat_summary(fun.data = "mean_se", geom = "errorbar", width = 0.1, size = 0.4, position = position_dodge(width = 0.1)) +
+      geom_jitter(
+      width = .25,
+      height = 0,
+      alpha = .17
+    ) +
+      scale_color_manual(values = c("#bba800", "#025774"), aesthetics = c("colour", "fill")) 
+  } else {
+    # Bar plot: add bars with patterns and error bars
+    plot <- plot +
+      stat_summary(
+        aes(pattern = Preferencia),
+        fun = "mean",
+        geom = "col_pattern",
+        color = "#3a255f",
+        pattern_fill = "#8f5497",
+        pattern_alpha = 0.4,
+        pattern_density = 0.4,
+        pattern_key_scale_factor = 0.8,
+        width = 0.8,
+        position = position_dodge(width = dodge_width)
+      ) +
+      stat_summary(
+        fun.data = "mean_se",
+        geom = "errorbar",
+        width = 0.18,
+        size = 0.6,
+        position = position_dodge(width = dodge_width)
+      ) +
+      scale_color_manual(values = c("#efc000", "#006A8E"), aesthetics = c("colour", "fill")) 
+  }
+  
+  # Common plot elements
+  plot <- plot +
+    # ggthemes::theme_base() +
+    theme_classic(base_size = 14) +
+    facet_grid(facet_formula) +
+    geom_hline(yintercept = hline_val, linetype = 2, color = "black", linewidth = 0.6) +
+    labs(x = x_lab_name, y = y_lab_name, subtitle = anova_caption) +  # Add caption for ANOVA
+    # scale_color_manual(values = c("#efc000", "#006A8E"), aesthetics = c("colour", "fill")) +
+    theme(legend.position = "top", axis.text.x = element_text(angle = 0, hjust = 0.5))
+
+  # Adjust X-axis scale for bar plot (remove for line plot)
+  if (geom != "line") {
+    plot <- plot + scale_x_discrete(labels = rep(c("Blanco", "Op."), times = 2)) +
+      scale_pattern_manual(values = c("none", "crosshatch"), guide = "none") +
+      guides(fill = guide_legend(override.aes = list(pattern = "none")))
+  }
+
+  # Conditionally add custom Y scale
+  if (use_custom_y_scale) {
+    plot <- plot + scale_y_continuous(
+      labels = function(x) paste0(round(x * 100 / 60, 0), "%"),
+      breaks = function(limits) seq(0, 60, by = 12),
+      limits = c(0, limy),
+      expand = c(0, 0),
+      guide = "prism_offset_minor"
+    )
+  } else {
+    plot <- plot + scale_y_continuous(
+      limits = c(0, limy),
+      expand = c(0, 0),
+      breaks = seq(0, limy, by = 20),
+      guide = "prism_offset_minor"
+    )
+  }
+  
+  return(plot)
+}
+
+# Step 4: Customize Facet Strips Function
+customize_facet_strips <- function(plot, strip_colors) {
+  g <- ggplot_gtable(ggplot_build(plot))
+  strip_both <- which(grepl('strip-', g$layout$name))
+  
+  for (k in seq_along(strip_both)) {
+    strip_index <- strip_both[k]
+    
+    if ("grob" %in% class(g$grobs[[strip_index]])) {
+      rect_idx <- which(sapply(g$grobs[[strip_index]]$grobs[[1]]$children, function(x) grepl("rect", x$name)))
+      if (length(rect_idx) > 0) {
+        g$grobs[[strip_index]]$grobs[[1]]$children[[rect_idx]]$gp$fill <- strip_colors[k]
+      }
+    }
+  }
+  
+  grid::grid.draw(g)
+}
+
+# Step 5: Run Full Analysis
+
+# # Example DataFrame
+# df_wm_flx_dummy <- data.frame(
+#   id = rep(1:10, times = 4),
+#   Tratamiento = rep(c("Flx", "Salina"), each = 5),
+#   Estres = rep(c("Control", "CUMS"), each = 10, times = 2),
+#   Tiempo = rep(c("T1", "T2", "T3", "T4"), each = 10),
+#   latencia = rnorm(40, mean = 30, sd = 10),
+#   prueba = rep(c("P-1", "Entr1", "Entr2", "Entr3"), each = 5),
+#   cuadrantes = rep(c("Blanco", "Op."), times = 20)
+# )
+
+# Prepare the data
+# test_filter <- "P-1"
+# df_prepared <- prepare_data(df_wm_flx, test_filter)
+
+# # # Run the ANOVA test with summarization
+# anova_results_dumdum <- run_anova_test(
+#   df_prepared, 
+#   dv = "latencia", 
+#   id_col = "id", 
+#   within_col = "Tiempo", 
+#   between_cols = c("Tratamiento", "Estres"), 
+#   agrupar_variables = TRUE
+# )
+
+# # # Display the ANOVA results
+# print(anova_results_dumdum)
+
+# anova_caption <- rstatix::get_test_label(anova_results_dumdum, detailed = TRUE)
+
+# Create the plot
+# plot <- create_plot(df_prepared, 
+#                     y_var = "latencia", 
+#                     treatment_var = "Tratamiento", 
+#                     facet_var = "Estres", 
+#                     within_col = "Tiempo", 
+#                     geom = "line",  # Line plot
+#                     x_lab_name = "Tiempo", 
+#                     y_lab_name = "seg", 
+#                     hline_val = 0, 
+#                     limy = 60, 
+#                     use_custom_y_scale = FALSE, 
+#                     anova_caption = anova_caption)
+
+# Customize the facet strips
+# customize_facet_strips(plot, strip_colors = c("#ffffff", "#e2345a"))
+
+
+
+
+##########
+
+run_analysis <- function(df, test_filter, cols_to_pivot = NULL, dv, id_col, 
+                         use_custom_y_scale = FALSE, within_col, between_cols, treatment_var, facet_var, 
+                         geom = "col_pattern", dodge_width = 0.85, 
+                         x_lab_name, y_lab_name, hline_val, limy, 
+                         strip_colors = c("#ffffff", "#e2345a")) {
+  
+  # Step 1: Prepare Data
+  prepared_data <- prepare_data(df, test_filter, cols_to_pivot)
+  
+  # Step 2: Run ANOVA Test
+  anova_results <- run_anova_test(
+    prepared_data, 
+    dv = dv, 
+    id_col = id_col, 
+    within_col = within_col, 
+    between_cols = between_cols, 
+    agrupar_variables = TRUE
+  )
+  
+  # Step 3: Generate ANOVA Caption
+  anova_caption <- rstatix::get_test_label(anova_results, detailed = TRUE)
+  
+  # Step 4: Create Plot with ANOVA caption
+  plot <- create_plot(
+    df = prepared_data, 
+    y_var = dv, 
+    treatment_var = treatment_var, 
+    facet_var = facet_var, 
+    within_col = within_col, 
+    geom = geom,  # Line plot or bar plot
+    dodge_width = dodge_width, 
+    x_lab_name = x_lab_name, 
+    y_lab_name = y_lab_name, 
+    hline_val = hline_val, 
+    limy = limy, 
+    use_custom_y_scale = use_custom_y_scale, 
+    anova_caption 
+  )
+  
+  # Step 5: Customize Facet Strips
+  customize_facet_strips(plot, strip_colors)
+  
+  # Step 6: Return ANOVA results and plot
+  return(list(anova_results = anova_results, plot = plot))
+}
+
+
+
+
+```
+
+```{r funcionesentrenamientos}
+#| label: funcionesentrenamientos
+
+
+run_analysis <- function(df, test_filter, cols_to_pivot = NULL, dv, id_col, 
+                         use_custom_y_scale = FALSE, within_col, between_cols, treatment_var, facet_var, 
+                         geom = "col_pattern", dodge_width = 0.85, 
+                         x_lab_name, y_lab_name, hline_val, limy, 
+                         strip_colors = c("#ffffff", "#e2345a")) {
+  
+  # Step 1: Prepare Data
+  prepared_data <- prepare_data(df, test_filter, cols_to_pivot)
+  
+  # Step 2: Run ANOVA Test
+  anova_results <- run_anova_test(
+    prepared_data, 
+    dv = dv, 
+    id_col = id_col, 
+    within_col = within_col, 
+    between_cols = between_cols, 
+    agrupar_variables = TRUE
+  )
+  
+  # Step 3: Generate ANOVA Caption
+  anova_caption <- rstatix::get_test_label(anova_results, detailed = TRUE)
+  
+  # Step 4: Create Plot with ANOVA caption
+  plot <- create_plot(
+    df = prepared_data, 
+    y_var = dv, 
+    treatment_var = treatment_var, 
+    facet_var = facet_var, 
+    within_col = within_col, 
+    geom = geom,  # Line plot or bar plot
+    dodge_width = dodge_width, 
+    x_lab_name = x_lab_name, 
+    y_lab_name = y_lab_name, 
+    hline_val = hline_val, 
+    limy = limy, 
+    use_custom_y_scale = use_custom_y_scale, 
+    anova_caption 
+  )
+  
+  # Step 5: Customize Facet Strips
+  customize_facet_strips(plot, strip_colors)
+  
+  # Step 6: Return ANOVA results and plot
+  return(list(anova_results = anova_results, plot = plot))
+}
+
+
+
+```
+
+```{r funcionEstrategias}
+#| label: funcionEstrategias
+
+
+# create_estrategias_plot <- function(data, prueba_filter) {
+create_estrategias_plot <- function(data) {
+  estrategias <- data 
+
+  estrategias_plot <- ggplot(data = estrategias,
+          aes(x = dia, y = rate,
+              group = Tratamiento.Farm,
+              shape = Estres,
+              color = Tratamiento.Farm,
+              fill = Tratamiento.Farm
+              )
+    ) +
+    geom_line(linewidth = 0.3, linetype = "dashed", position = position_dodge(0.2)) +
+    geom_point(size = 3, position = position_dodge(0.2)) +
+  # geom_point(size = 7, shape = 21, position = position_dodge(0.1)) +
+    geom_pointrange(aes(ymin = rate-SE, ymax = rate+SE),
+                  size = 0.85, position = position_dodge(0.2)) +
+    facet_grid(Estres ~ estrategias_hipo) +
+    theme_prism(base_size = 14, palette = "candy_bright") + # border = TRUE
+    scale_shape_prism(palette = "filled") +
+    scale_y_continuous(limits = c(0, 4), guide = "prism_offset_minor") +
+    # guides(colour = guide_legend(position = "inside"),
+    #        fill = guide_legend(position = "inside"),
+    #        shape = guide_legend(position = "inside")) +
+    theme(legend.position = "top",
+          legend.position.inside = c(0.8, 0.75),
+          legend.key.height = unit(13, "pt")) +
+    labs(x = "Día",
+         y = "") +
+    # coord_cartesian(clip = "off") +
+    scale_color_prism("colorblind_safe") +
+    scale_fill_prism("colorblind_safe")
+
+  return(estrategias_plot)
+}
+
+
+```
+
+```{r funcionespruebas}
+#| label: funcionespruebas
+
+create_cuadrantes_plot <- function(data, prueba_filter = "P-1", dodge_width = 0.85) {
+  wm.cuadrantes <- data %>%
+    dplyr::select(cuadrante_ne,
+                  cuadrante_no,
+                  cuadrante_se,
+                  cuadrante_so,
+                  id, tratamientos, stage, dia, prueba, Tratamiento.Farm, Estres) %>%
+    dplyr::filter(str_detect(prueba, "P")) %>%
+    mutate(Blanco = case_when(
+             prueba == "P-1" ~ cuadrante_ne,
+             prueba == "P-2" ~ cuadrante_ne,
+             prueba == "P-Rev" ~ cuadrante_so
+             )) |>
+    mutate(Opuestos = case_when(
+             prueba == "P-1" ~ (cuadrante_no + cuadrante_se + cuadrante_so)/3 ,
+             prueba == "P-2" ~ (cuadrante_no + cuadrante_se + cuadrante_so)/3,
+             prueba == "P-Rev" ~ (cuadrante_no + cuadrante_se + cuadrante_so)/3
+             )) |>
+    pivot_longer(
+      cols = c("Blanco", "Opuestos"),
+      names_to = "cuadrantes",
+      values_to = "tiempo",
+      values_drop_na = TRUE
+    )
+
+  wm.cuadrantes.p1 <- wm.cuadrantes %>%
+    dplyr::filter(prueba == prueba_filter)
+
+  wm.cuadrantes.p1$cuadrantes <- as.factor(wm.cuadrantes.p1$cuadrantes)
+
+  cuadrantes_plot <- ggplot(data = wm.cuadrantes.p1,
+          aes(x = cuadrantes, y = tiempo,
+              # color = tratamientos,
+              fill =  Estres,
+              # group = cuadrantes,
+              # pattern = Estres
+              )
+    ) +
+    stat_summary(
+      # aes(pattern=Estres, fill = Tratamiento.Farm),
+      # aes(fill=Estres),
+      fun = "mean",
+      geom = "col",
+      # color = "black", 
+                      #  pattern_fill = "black",
+                      #  pattern_angle = 45,
+                      #  pattern_density = 0.1,
+                      #  pattern_spacing = 0.025,
+                      #  pattern_key_scale_factor = 0.6,
+      # pattern_fill="red", colour="black",
+      width = 0.8,
+      position = position_dodge(width = dodge_width)
+    ) +
+    # stat_summary(
+    #   fun.data = "mean_se",
+    #   geom = "errorbar",
+    #   alpha = 0.8,
+    #   width = 0.1,
+    #   linewidth = 1,
+    #   position = position_dodge(width = dodge_width)
+    # ) +
+    # scale_fill_manual(
+    #   values = c(
+    #     Fluoxetina = '#ef476f',
+    #     Salina = '#ffd166'
+    #   )
+    # ) +
+    # scale_pattern_manual(
+    #   values = c(
+    #     Control = "none",
+    #     CUMS = "crosshatch"
+    #   )
+    # ) +
+    facet_grid(~ Tratamiento.Farm) +
+    # scale_fill_manual(values = c("Fluoxetina" = "red", "Salina" = "white")) + # also scale_fill, not scale_color
+    # scale_pattern_manual(values = c(Control = "stripe", CUMS = "none")) +
+    # geom_jitter(
+    #   alpha = .4,
+    #   position = position_dodge(width = 0.9)
+    # ) +
+    # geom_hline(yintercept=15, linetype= 2, color = "black", linewidth = 0.6) +
+    # facet_grid(~ Estres) +
+    # theme_prism(base_size = 14, palette = "candy_bright") + # border = TRUE
+    # theme(legend.position = "top") +
+    # scale_shape_prism(palette = "filled") +
+    scale_y_continuous(
+      guide = "prism_offset_minor",
+      labels = function(x) paste0(round(x*100/60, 0), "%"), # Multiply by 100 & add %, 0 decimals
+      breaks = function(limits) seq(0, 60, by = 12), # set the breaks to 6, starting from 0, ending at 50
+      limits = c(0, 60)
+    ) 
+#  theme(strip.background = element_rect(colour="black", fill="white", 
+#                                        size=1.5, linetype="solid")) +
+#   guides(fill = guide_legend(override.aes = list(pattern = "none")))
+    # scale_x_discrete(guide = "prism_bracket") +
+    # guides(colour = guide_legend(position = "inside"),
+    #        fill = guide_legend(position = "inside"),
+    #        shape = guide_legend(position = "inside")) +
+    # theme(legend.position.inside = c(0.8, 0.75),
+    #       legend.key.height = unit(13, "pt")) +
+    # labs(
+      # fill = "Tratamiento.Farm",
+      # y = "Porcentaje de Ocupación") +
+    # scale_color_prism("colorblind_safe") +
+    # scale_fill_prism("colorblind_safe") +
+    # scale_fill_manual(labels = c("Flx", "Sal"),
+    #                 values = c("blue", "gold"), 
+    #                 guide = "legend", 
+    #                 (title = "Trar")) +
+    # scale_color_manual(labels = c("Flx", "Sal"),
+    #                 values = c("blue", "gold"), 
+    #                 guide = "legend", 
+    #                 (title = "Trar")) +
+    # scale_pattern_manual(values=c("none", "crosshatch")) 
+  # coord_fixed(ratio = 1)
+
+  return(cuadrantes_plot)
+}
+
+# Example usage:
+# cuadrantes_plot <- create_cuadrantes_plot(df_wm_flx, "P-1")
+# print(cuadrantes_plot)
+
+# cuadrantes_plot_p1 <- create_cuadrantes_plot(df_wm_flx, "P-1")
+
+create_zona_plot <- function(data, prueba_filter = "P-1", dodge_width = 0.85) {
+  wm.zona <- data %>%
+    dplyr::select(zona_ne,
+                  zona_so,
+                  id, tratamientos, stage, dia, prueba, Tratamiento.Farm, Estres) %>%
+    dplyr::filter(str_detect(prueba, "P")) %>%
+    mutate(Blanco = case_when(
+             prueba == "P-1" ~ zona_ne,
+             prueba == "P-2" ~ zona_ne,
+             prueba == "P-Rev" ~ zona_so
+             )) |>
+    pivot_longer(
+      cols = c("Blanco"),
+      names_to = "zona",
+      values_to = "tiempo",
+      values_drop_na = TRUE
+    )
+
+  wm.zona.p1 <- wm.zona %>%
+    dplyr::filter(prueba == prueba_filter)
+
+  wm.zona.p1$zona <- as.factor(wm.zona.p1$zona)
+
+  zona_plot <- ggplot(data = wm.zona.p1,
+          aes(x = zona, y = tiempo,
+              # color = tratamientos,
+              fill = Estres
+              )
+    ) +
+    stat_summary(
+      fun = "mean",
+      geom = "col",
+      width = 0.8,
+      position = position_dodge(width = dodge_width)
+    ) +
+    stat_summary(
+      fun.data = "mean_se",
+      geom = "errorbar",
+      alpha = 0.8,
+      width = 0.1,
+      linewidth = 1,
+      position = position_dodge(width = dodge_width)
+    ) +
+    facet_grid(~ Tratamiento.Farm) +
+    # geom_jitter(
+    #   alpha = .4,
+    #   position = position_dodge(width = 0.9)
+    # ) +
+    geom_hline(yintercept=6.6, linetype= 2, color = "black", linewidth = 0.6) + # 6.6 es el 11% de 60
+    theme_prism(base_size = 14, palette = "candy_bright") + # border = TRUE
+    theme(legend.position = "top") +
+    scale_shape_prism(palette = "filled") +
+    scale_y_continuous(
+      guide = "prism_offset_minor",
+      labels = function(x) paste0(round(x*100/60, 0), "%"), # Multiply by 100 & add %, 0 decimals
+      breaks = function(limits) seq(0, 36, by = 18), # set the breaks to 6, starting from 0, ending at 50
+      limits = c(0, 36)
+    ) +
+    scale_x_discrete(guide = "prism_bracket") +
+    guides(colour = guide_legend(position = "inside"),
+           fill = guide_legend(position = "inside"),
+           shape = guide_legend(position = "inside")) +
+    theme(legend.position.inside = c(0.8, 0.75),
+          legend.key.height = unit(13, "pt")) +
+    labs(
+      fill = "Tratamientos",
+      y = "Porcentaje de Ocupación") +
+    scale_color_prism("colorblind_safe") +
+    scale_fill_prism("colorblind_safe")
+
+  return(zona_plot)
+}
+
+create_dmedia_plot <- function(data, prueba_filter = "P-1", dodge_width = 0.85) {
+  wm.dmedia <- data %>%
+    dplyr::select(distancia_annulus_ne,
+                  distancia_annulus_so,
+                  id, tratamientos, stage, dia, prueba, Tratamiento.Farm, Estres) %>%
+    dplyr::filter(str_detect(prueba, "P")) %>%
+    mutate(Blanco = case_when(
+             prueba == "P-1" ~ distancia_annulus_ne,
+             prueba == "P-2" ~ distancia_annulus_ne,
+             prueba == "P-Rev" ~ distancia_annulus_so
+             )) |>
+    pivot_longer(
+      cols = c("Blanco"),
+      names_to = "Distancia",
+      values_to = "tiempo",
+      values_drop_na = TRUE
+    )
+
+  wm.dmedia.p1 <- wm.dmedia %>%
+    dplyr::filter(prueba == prueba_filter)
+
+  wm.dmedia.p1$Distancia <- as.factor(wm.dmedia.p1$Distancia)
+
+  dmedia_plot <- ggplot(data = wm.dmedia.p1,
+          aes(x = Distancia, y = tiempo,
+              # color = tratamientos,
+              fill = Estres
+              )
+    ) +
+    stat_summary(
+      fun = "mean",
+      geom = "col",
+      width = 0.8,
+      position = position_dodge(width = dodge_width)
+    ) +
+    stat_summary(
+      fun.data = "mean_se",
+      geom = "errorbar",
+      alpha = 0.8,
+      width = 0.1,
+      linewidth = 1,
+      position = position_dodge(width = dodge_width)
+    ) +
+    geom_jitter(
+      alpha = .5,
+      color = "#FF9800",
+      stroke = 0.7,
+      position = position_dodge(width = dodge_width)
+    ) +
+    facet_grid(~ Tratamiento.Farm) +
+    theme_prism(base_size = 14, palette = "candy_bright") + # border = TRUE
+    theme(legend.position = "top") +
+    scale_shape_prism(palette = "filled") +
+    scale_y_continuous(
+      guide = "prism_offset_minor",
+      limits = c(0, 0.5)
+    ) +
+    scale_x_discrete(guide = "prism_bracket") +
+    guides(colour = guide_legend(position = "inside"),
+           fill = guide_legend(position = "inside"),
+           shape = guide_legend(position = "inside")) +
+    theme(legend.position.inside = c(0.8, 0.9),
+          legend.key.height = unit(13, "pt")) +
+    labs(
+      fill = "Tratamientos",
+      y = "metros") +
+    scale_color_prism("colorblind_safe") +
+    scale_fill_prism("colorblind_safe")
+
+  return(dmedia_plot)
+}
+
+```
+
+
+## Memoria Espacial en el Laberinto de Morris
+
+### Desempeño en la prueba de entrenamiento
+
+\todo{agregar pequeña descripción de cada resultado.}
+
+Para evaluar el rendimiento de los animales en la ***primera fase de aprendizaje*** (previo al *CUMS*), se compararon las latencias de escape (tiempo que tardan los ratones en localizar la plataforma durante los días de entrenamiento) (@fig-latenciasPre). El ANOVA Mixto sugiere que no existe una interacción significativa entre `Tiempo x Tratamiento x Estrés` (`F(3, 72) = 0.66, p = 0.577`).  Esto sugiere que no hay diferencias significativas en la latencia de escape entre los grupos de tratamiento y estrés durante la fase de entrenamiento (previo al estrés crónico).
+
+
+```{r latenciasPre}
+#| label: fig-latenciasPre
+#| fig-cap: Latencias de escape durante la fase de entrenamiento. Las medias graficadas representan el tiempo que tardan los ratones en localizar la plataforma durante los días de entrenamiento. Graficado con Media ± error estándar. Se sobrepone un gráfico de dispersión que indica las observaciones individuales de cada grupo. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto.`* = p` $<$ `0.05`, `** = p` $<$ `0.01`, `*** = p` $<$ `0.001`. 
+#| fig-scap: "Latencias de escape durante la fase de entrenamiento"
+#| out-width: "85%"
+
+
+# Run the analysis
+analysis_results <- run_analysis(
+  df = df_wm_flx, 
+  test_filter = "Ent", 
+  cols_to_pivot = NULL,  # Since we're not pivoting in this example
+  dv = "latencia", 
+  id_col = "id", 
+  use_custom_y_scale = FALSE, 
+  within_col = "Tiempo", 
+  between_cols = c("Tratamiento", "Estres"), 
+  treatment_var = "Tratamiento", 
+  facet_var = "Estres", 
+  geom = "line",  # Line plot
+  x_lab_name = "Tiempo", 
+  y_lab_name = "Latencia (seg)", 
+  hline_val = 0, 
+  limy = 60, 
+  strip_colors = c("#ffffff", "#e2345a")
+)
+
+# # Access the results
+# plot <- analysis_results$plot
+
+anova_results <- analysis_results$anova_results
+
+###
+
+# pwcmps <- prepare_data(df_wm_flx, "Entr")
+
+# stat.test <- pwcmps %>%
+#   group_by(Estres, Tiempo) %>%
+#   rstatix::t_test(latencia ~ Tratamiento) %>%
+#   rstatix::adjust_pvalue(method = "holm") %>%
+#   rstatix::add_significance()
+
+# comp_a <- data.frame(Tiempo = 1, latencia = 38, lab = "*",
+#                         Estres = factor("NO-Estrés", levels = c("NO-Estrés", "CUMS")) ,
+#                        Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+# comp_b <- data.frame(Tiempo = 2, latencia = 35, lab = "**",
+#                         Estres = factor("CUMS", levels = c("NO-Estrés", "CUMS")) ,
+#                        Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+# plot <- plot +
+#   geom_text(data = comp_a, label = "*", colour = "#000000", size = 9) +
+#   geom_text(data = comp_b, label = "**", colour = "#8b0101", size = 9) +
+#   labs(
+#     title = "Latencias Originales"
+#     # caption = rstatix::create_test_label(
+#     #   description = "Interacción Estres x Tiempo",
+#     #   statistic.text = "F", 
+#     #   parameter = "3, 84",
+#     #   statistic = 6.417,
+#     #   p = "<0.001",
+#     #   n = 10,
+#     #   effect.size = 0.056,
+#     #   effect.size.text = quote(italic("eta^2")),
+#     #   detailed = TRUE,
+#     #   type = "expression"
+#     # )
+#   ) +
+#   scale_x_continuous(n.breaks=4, labels=c("1","2", "3", "4"))
+
+####
+
+
+
+# Access the results
+plot <- analysis_results$plot
+
+
+comp_a <- data.frame(Tiempo = 1, latencia = 38, lab = "*",
+                        Estres = factor("NO-Estrés", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+comp_b <- data.frame(Tiempo = 2, latencia = 32, lab = "**",
+                        Estres = factor("CUMS", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+plot <- plot +
+  geom_text(data = comp_a, label = "*", colour = "#000000", size = 7.5) +
+  geom_text(data = comp_b, label = "**", colour = "#8b0101", size = 7.5) +
+  labs(
+    title = "Latencias de Escape",
+    x = "Dia"
+    # caption = rstatix::create_test_label(
+    #   description = "Interacción Estres x Tiempo",
+    #   statistic.text = "F", 
+    #   parameter = "3, 84",
+    #   statistic = 6.417,
+    #   p = "<0.001",
+    #   n = 10,
+    #   effect.size = 0.056,
+    #   effect.size.text = quote(italic("eta^2")),
+    #   detailed = TRUE,
+    #   type = "expression"
+    # )
+  ) +
+  scale_x_continuous(n.breaks=4, labels=c("1","2", "3", "4"), expand = c(0, 0)) 
+
+
+
+
+customize_facet_strips(plot, strip_colors = c("#ffffff", "#e2345a"))
+
+
+```
+
+
+```{r tablaLatencias}
+
+# # Display the ANOVA table and plot
+
+anova_results <- as.tibble(anova_results) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA Latencias",
+              caption = "ANOVA Latencias") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"), # scale_down  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) %>% 
+        # Add footnotes with better formatting
+      footnote(
+        number = c(
+          "$\\\\eta^2$ > 0.14 = Efecto grande, $\\\\eta^2$ > 0.06 = Efecto medio, $\\\\eta^2$ < 0.14 = Efecto pequeño",
+          # "$y = a+b;$", "$e = mc^2;$","\\\\%"
+          "  * = p < 0.05, ** = p < 0.01, *** = p < 0.001"
+        ),
+        escape = FALSE,
+        fixed_small_size = TRUE,
+        threeparttable = TRUE
+      ) 
+
+# Show the ANOVA results
+# knitr::kable(rstatix::get_anova_table(analysis_results$anova_results, correction = "auto"))
+
+# knitr::kable(stat.test, 
+#               col.names=c("Tiempo","Estres", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "Latencias Originales Comparaciónes") %>%
+#         kable_classic_2("hover", full_width = F) 
+
+
+
+```
+
+Luego, para comprobar que el aprendizaje en esta etapa fuera dependiente del hipocampo (estrategias [alocéntricas](AppendixB.qmd#term-id-97)), se analizaron las estrategias de búsqueda utilizadas en estos entrenamientos iniciales ([Fig @fig-estrategiasPre]). Para entender mejor la relación entre el uso de estrategias a través del tiempo en los distintos tratamientos, ajustamos una regresión de Poisson con efectos mixtos (utilizando máxima [verosimilitud](AppendixB.qmd#term-id-78)). La variable de respuesta es el número de tipo de estrategias, y las variables predictoras son el tiempo y tratamiento. Se incluyeron a los ratones como efectos mixtos para tomar en cuenta la dependencia de los datos en el tiempo (medidas repetidas). El modelo de regresión no presentó sobre [dispersión](AppendixB.qmd#term-id-77) (*dispersion ratio* = 0.69), por lo que cumple con el supuesto de homogeneidad de varianza en los datos y el modelo. Dentro de este modelo, el efecto de interacción entre `Tratamiento x Estres x Estrategia (alocéntrica, egocéntrica)` no fue significativo (prueba de razón de verosimilitud $X^2 (4) = 5.127, p = 0.274$).  Por otro lado, la interacción `Tiempo x Estrategia` es significativa (prueba de razón de verosimilitud $X^2 (1) = 26.125, p < 0.001$). Esto sugiere que el uso de estrategias cambia a lo largo del tiempo, independientemente del tratamiento y el estrés.
+
+
+
+```{r estrategiasPre}
+#| label: fig-estrategiasPre
+#| fig-cap: Estrategias de búsqueda durante la fase de entrenamiento. Las medias graficadas representan el estimado de estrategias utilizadas por tratamiento en cada día de los entrenamientos (4 pruebas por día).  
+#| fig-scap: "Estrategias de búsqueda durante la fase de entrenamiento"
+#| fig-pos: H
+#| out-width: "95%"
+
+p <- estrategias_df_pre %>%
+  mutate(estrategias_hipo = fct_relevel(estrategias_hipo, "Egocéntricas", "Alocéntricas")) %>%
+  ggplot( 
+      aes(fill=estrategias_hipo, 
+          y=rate, x=dia)) + 
+    geom_bar(position="fill", stat="identity", color = "black") +
+    facet_grid(Estres ~ Tratamiento.Farm) +
+    scale_fill_manual(values = alpha(c("#EA5455", "#2D4059"), 0.7)) +
+    scale_y_continuous(labels = c("0", "1", "2", "3", "4")) +  # Adjust y-axis limits for divergence
+    ggthemes::theme_clean(base_size = 14)+
+    theme(legend.position = "top") +
+    guides(fill = guide_legend(title = "")) +
+    labs(x = "Día", y = "Número Estrategias", title = "Estrategias de búsqueda") 
+
+
+customize_facet_strips(p, strip_colors = c("#ffffff", "#cad0d2", "#ffffff", "#e2345a"))
+
+
+
+# library(glmmTMB)
+# flx_data <- read.csv("./data/raw/estrategias_pre_poisson.csv")
+# flx_data <- read.csv("./data/raw/estrategias_post_poisson.csv")
+# flx_data <- read.csv("./data/raw/estrategias_post_poisson2.csv")
+
+# flx_data <- flx_data %>%
+#   dplyr::filter(str_detect(stage, "entrenamiento_"))
+
+# glm_zip <- glmmTMB(count ~ Tratamiento.Farm * Estres * estrategias_hipo * dia + (1 | x_target_id), 
+#                    ziformula = ~1, 
+#                    family = poisson, 
+#                    data = flx_data)
+
+# glm_zip_2 <- glmmTMB(count ~ Tratamiento.Farm + Estres + estrategias_hipo + dia + (1 | x_target_id), 
+#                    ziformula = ~1, 
+#                    family = poisson, 
+#                    data = flx_data)
+
+# anova(glm_zip, glm_zip_2)
+
+# glm_zip <- glmmTMB(count ~ estrategias_hipo * dia + (1 | x_target_id), 
+#                    ziformula = ~1, 
+#                    family = poisson, 
+#                    data = flx_data)
+
+# glm_zip_2 <- glmmTMB(count ~ estrategias_hipo + dia + (1 | x_target_id), 
+#                    ziformula = ~1, 
+#                    family = poisson, 
+#                    data = flx_data)
+
+# anova(glm_zip, glm_zip_2)
+
+
+# library("blmeco")
+# dispersion_glmer(glm1)
+# [1] 0.6924801
+# plot(fitted(glm1), residuals(glm1, type = "pearson"))
+# print(ranef(glm1))
+# library(DHARMa)
+# testZeroInkflation(glm1)
+
+# cuadrantes.emmeans.lmer <- emmeans(glm_zip,  
+#                         ~ Tratamiento.Farm | Estres | estrategias_hipo | dia, cov.reduce = FALSE)
+
+
+# cuadrantes.emmeans.lmer.df <- as.data.frame(cuadrantes.emmeans.lmer)
+
+
+# # library(gghighlight)
+
+# ggplot(cuadrantes.emmeans.lmer.df,
+#                     aes(
+#                       x = dia,
+#                       y = emmean,
+#                       group = Tratamiento.Farm,
+#                       color = Tratamiento.Farm
+#                     )) +
+#   geom_line(linewidth = 0.3, linetype = "dashed", position = position_dodge(0.1)) +
+#   geom_point(size = 3, position = position_dodge(0.1), aes(shape = Tratamiento.Farm)) +
+#   # geom_point(size = 7, shape = 21, position = position_dodge(0.1)) +
+#   geom_pointrange(aes(ymin = emmean-SE, ymax = emmean+SE),
+#                   size = 0.75, position = position_dodge(0.1)) + 
+#   facet_wrap( estrategias_hipo ~ Estres, axis.labels = "all_x") 
+
+
+
+# scale_color_manual(values = c("#222831", "#00ADB5", "#FF2E63", "#FF9800", "#8675A9", "#862B0D")) +
+#   gghighlight(emmean > 15, calculate_per_facet = T, use_direct_label = FALSE,
+#               unhighlighted_params = list(colour = NULL, alpha = 0.3)) +
+#   geom_hline(yintercept=15, linetype="dashed", color = "#006769", linewidth = 0.6) +
+#   labs(
+#     # caption = "Plotted with SEM",
+#     color = "Tratamientos",
+#     shape = "Tratamientos",
+#     x = "Prueba",
+#     y = "Segundos (s)") +
+#   ylim(0, 40) +
+#   # scale_x_discrete(labels=c("entrenamiento_rev_1"="1", "entrenamiento_rev_2"="2")) +
+#   # theme_classic() +
+#   # ggthemes::theme_base() +
+#   ggthemes::theme_clean() +
+#   # ggthemes::theme_clean() + 
+#   theme(legend.position='top', axis.text = element_text(size = 12),axis.title = element_text(size = 15)) 
+
+```
+
+###  Prueba 1 del MWM - Retención
+
+::: {#fig-mapasp1 layout="[[25,25,25,25], [100]]" fig-pos='H'}
+
+![Salina](../Figures/mapa_calor_sal_ctrl_p1.png)
+
+![Flx](../Figures/mapa_calor_Flx_p1.png)
+
+![Salina-CUMS](../Figures/mapa_calor_CUMS_p1.png)
+
+![Flx-CUMS](../Figures/mapa_calor_Flx_CUMS_p1.png)
+
+![](../Figures/mapa_escala.png){fig-align="center"}
+
+Mapas de densidad (estimados por \ac{kde}) en la Prueba-1 en el \ac{mwm}. El círculo rosa rodeado por un borde negro en el cuadrante noreste representa la localización de la plataforma.
+
+::: 
+
+
+Para evaluar la retención del aprendizaje espacial, se compararon los tiempos de permanencia en los cuadrantes del laberinto de Morris durante la primera prueba de **retención** (@fig-cuadranteP1Plot). El ANOVA mixto sugiere que no existe una interacción significativa entre `Tratamiento x Estrés x Preferencia` (`F(1, 25) = 1.858, p = 0.19`), demostrando que no existen diferencias iniciales entre los grupos. De acuerdo cone el criterio de exclusión (`tiempo en cuadrante objetivo en la Prueba 1 del Morris Water Maze < 15 segundos`), se excluyeron un total de 4 ratones del experimento (2 del grupo `Salina sin estrés` y 2 del grupo `Fluoxetina sin estrés`). 
+
+```{r cuadrantesP1}
+#| label: fig-cuadranteP1Plot
+#| fig-cap: Tiempos de permanencia en los cuadrantes del laberinto de Morris durante la primera prueba del MWM. Linea punteada en el valor de 25% representa preferencia por dicho cuadrante. Graficado con Media ± error estándar. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto.
+#| fig-scap: "Prueba 1 Tiempo en Cuadrantes"
+#| fig-pos: H
+#| out-width: "90%"
+
+
+
+# Run the analysis
+analysis_results <- run_analysis(
+  df = df_wm_flx, 
+  test_filter = "P-1", 
+  cols_to_pivot = c("Blanco", "Opuestos"),
+  dv = "Porcentaje", 
+  id_col = "id", 
+  use_custom_y_scale = TRUE, 
+  within_col = "Preferencia", 
+  between_cols = c("Tratamiento", "Estres"), 
+  treatment_var = "Tratamiento", 
+  facet_var = "Estres", 
+  geom = "col_pattern",  
+  x_lab_name = "Cuadrantes", 
+  y_lab_name = "Tiempo de Ocupación", 
+  hline_val = 15, 
+  limy = 40, 
+  strip_colors = c("#ffffff", "#e2345a")
+)
+
+
+# Access the results
+plot <- analysis_results$plot
+
+anova_results <- analysis_results$anova_results
+
+###
+
+# pwcmps <- prepare_data(df_wm_flx, "P-1", cols_to_pivot = c("Blanco", "Opuestos"), names_to = "cuadrantes", values_to = "Porcentaje")
+
+# stat.test <- pwcmps %>%
+#   group_by(Estres, cuadrantes) %>%
+#   rstatix::t_test(Porcentaje ~ Tratamiento) %>%
+#   rstatix::adjust_pvalue(method = "holm") %>%
+#   rstatix::add_significance()
+
+# comp_a <- data.frame(Tiempo = 1, latencia = 38, lab = "*",
+#                         Estres = factor("NO-Estrés", levels = c("NO-Estrés", "CUMS")) ,
+#                        Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+# comp_b <- data.frame(Tiempo = 2, latencia = 35, lab = "**",
+#                         Estres = factor("CUMS", levels = c("NO-Estrés", "CUMS")) ,
+#                        Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+plot <- plot +
+  # geom_text(data = comp_a, label = "*", colour = "#000000", size = 9) +
+  # geom_text(data = comp_b, label = "**", colour = "#000000", size = 9) +
+  labs(
+    title = "Prueba 1 Tiempo en Cuadrantes"
+    # caption = rstatix::create_test_label(
+    #   description = "Interacción Tratamiento x Cuadrante",
+    #   statistic.text = "F", 
+    #   parameter = "1, 29",
+    #   statistic = 6.132,
+    #   p = "0.019",
+    #   effect.size = 0.052,
+    #   effect.size.text = quote(italic("eta^2")),
+    #   detailed = TRUE,
+    #   type = "expression"
+    # )
+  ) 
+
+
+customize_facet_strips(plot, strip_colors = c("#ffffff", "#e2345a"))
+
+# knitr::kable(anova_results, 
+#               col.names=c("Efecto","Dfn", "Dfd", "F", "p", "p<.05", "eta2", ""),
+#               digits = 3,
+#               caption = "ANOVA P-1 Cuadrantes") %>%
+#         footnote(alphabet = c("Between = Tratamiento, Estres",
+#                               "Within = Cuadrantes.")) %>%
+#         kable_classic_2("hover", full_width = F)
+
+# knitr::kable(stat.test, 
+#               col.names=c("Estres", "Cuadrantes", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "P-1 Cuadrantes Comparaciónes") %>%
+#               footnote("Comparaciones para explorar la significancia de Tratamiento x Cuadrantes") %>% 
+#         kable_classic_2("hover", full_width = F)  
+
+
+```
+
+```{r cuadrantesTabla}
+
+####
+
+anova_results <- as.tibble(anova_results) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA P-1 Cuadrantes",
+              caption = "ANOVA Prueba 1 Tiempo en Cuadrantes") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"),  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) %>% 
+        # Add footnotes with better formatting
+      footnote(
+        number = c(
+          "$\\\\eta^2$ > 0.14 = Efecto grande, $\\\\eta^2$ > 0.06 = Efecto medio, $\\\\eta^2$ < 0.14 = Efecto pequeño",
+          # "$y = a+b;$", "$e = mc^2;$","\\\\%"
+          "  * = p < 0.05, ** = p < 0.01, *** = p < 0.001"
+        ),
+        escape = FALSE,
+        fixed_small_size = TRUE,
+        threeparttable = TRUE
+      ) 
+
+# knitr::kable(anova_results, 
+#               col.names=c("Efecto","Dfn", "Dfd", "F", "p", "p<.05", "eta2", ""),
+#               digits = 3,
+#               caption = "ANOVA P-1 Cuadrantes") %>%
+#         footnote(alphabet = c("Between = Tratamiento, Estres",
+#                               "Within = Cuadrantes.")) %>%
+#         kable_classic_2("hover", full_width = F)
+
+# knitr::kable(stat.test, 
+#               col.names=c("Estres", "Cuadrantes", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "P-1 Cuadrantes Comparaciónes") %>%
+#               footnote("Comparaciones para explorar la significancia de Tratamiento x Cuadrantes") %>% 
+#         kable_classic_2("hover", full_width = F)  
+
+
+```
+
+Adicionalmente se analizaron los tiempos de permanencia en la zona (@fig-wmmedidas) objetivo del laberinto de Morris durante la primera prueba (@fig-zonaP1Plot). El ANOVA mixto sugiere que no existe una interacción significativa entre `Tratamiento x Estrés x Preferencia` (`F(1, 25) = 0.247, p = 0.62`), por lo que tampoco existe evidencia de diferencias en la preferencia por la zona objetivo entre los grupos de tratamiento y estrés.
+
+```{r zonaP1}
+#| label: fig-zonaP1Plot
+#| fig-cap: Tiempos de permanencia en la zona objetivo del laberinto de Morris durante la primera prueba del MWM. Linea punteada en el valor de 11% representa preferencia por dicha zona. Graficado con Media ± error estándar. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto.
+#| fig-scap: "Prueba 1 Tiempo en Zonas"
+#| fig-pos: H
+#| out-width: "90%"
+
+# Example of running the analysis
+analysis_results <- run_analysis(
+  df = df_wm_flx,
+  test_filter = "P-1",
+  cols_to_pivot = c("zona_blanco", "zona_reversa"),
+  dv = "Porcentaje",
+  id_col = "id", 
+  use_custom_y_scale = TRUE,
+  within_col = "Preferencia",
+  between_cols = c("Tratamiento", "Estres"),
+  treatment_var = "Tratamiento",
+  facet_var = "Estres",  
+  geom = "col_pattern",  
+  x_lab_name = "Zona",
+  y_lab_name = "Tiempo de Ocupación",
+  hline_val = 6.6,
+  limy = 30,
+  strip_colors = c("#ffffff", "#e2345a")
+)
+
+# Access the results
+anova_results <- analysis_results$anova_results
+plot <- analysis_results$plot
+
+
+# pwcmps <- prepare_data(df_wm_flx, "P-1", cols_to_pivot = c("zona_blanco", "zona_reversa"), names_to = "cuadrantes", values_to = "Porcentaje")
+
+# stat.test <- pwcmps %>%
+#   group_by(Estres, cuadrantes) %>%
+#   rstatix::t_test(Porcentaje ~ Tratamiento) %>%
+#   rstatix::adjust_pvalue(method = "holm") %>%
+#   rstatix::add_significance()
+
+plot <- plot +
+  # geom_text(data = comp_a, label = "*", colour = "#000000", size = 9) +
+  # geom_text(data = comp_b, label = "**", colour = "#000000", size = 9) +
+  labs(
+    title = "Prueba 1 Tiempo en Zonas"
+    # caption = rstatix::create_test_label(
+    #   description = "Interacción Tratamiento x Cuadrante(zona)",
+    #   statistic.text = "F", 
+    #   parameter = "1, 29",
+    #   statistic = 7.213,
+    #   p = "0.012",
+    #   effect.size = 0.058,
+    #   effect.size.text = quote(italic("eta^2")),
+    #   detailed = TRUE,
+    #   type = "expression"
+    # )
+  ) 
+
+# # Display the ANOVA table and plot
+customize_facet_strips(plot, strip_colors = c("#ffffff", "#e2345a"))
+
+
+# knitr::kable(anova_results, 
+#               col.names=c("Efecto","Dfn", "Dfd", "F", "p", "p<.05", "eta2", ""),
+#               digits = 3,
+#               caption = "ANOVA P-1 Zona") %>%
+#         footnote(alphabet = c("Between = Tratamiento, Estres",
+#                               "Within = Zona(cuadrante).")) %>%
+#         kable_classic_2("hover", full_width = F)
+
+# knitr::kable(stat.test, 
+#               col.names=c("Estres", "Zona", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "P-1 Zona Comparaciónes") %>%
+#               footnote("Comparaciones para explorar la significancia de Tratamiento x Zona") %>% 
+#         kable_classic_2("hover", full_width = T)  
+```
+
+
+```{r zonp1tabla}
+
+# # Display the ANOVA table and plot
+
+anova_results <- as.tibble(anova_results) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA P-1 Zonas",
+              caption = "ANOVA Prueba-1 tiempo en Zonas") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"),  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) %>% 
+        # Add footnotes with better formatting
+      footnote(
+        number = c(
+          "$\\\\eta^2$ > 0.14 = Efecto grande, $\\\\eta^2$ > 0.06 = Efecto medio, $\\\\eta^2$ < 0.14 = Efecto pequeño",
+          # "$y = a+b;$", "$e = mc^2;$","\\\\%"
+          "  * = p < 0.05, ** = p < 0.01, *** = p < 0.001"
+        ),
+        escape = FALSE,
+        fixed_small_size = TRUE,
+        threeparttable = TRUE
+      ) 
+# Show the ANOVA results
+# knitr::kable(rstatix::get_anova_table(analysis_results$anova_results, correction = "auto"))
+
+# knitr::kable(stat.test, 
+#               col.names=c("Tiempo","Estres", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "Latencias Originales Comparaciónes") %>%
+#         kable_classic_2("hover", full_width = F) 
+
+```
+
+Por último, se examinó la distancia media al *annulus* blanco durante la primera prueba (@fig-dmediaP1Plot). El ANOVA de dos vías sugiere que no existe una interacción significativa entre `Tratamiento x Estrés` (`F(1, 25) = 0.081, p = 0.78`). Esto indica que no existen diferencias en la distancia media al *annulus* blanco entre los grupos de tratamiento y estrés.
+
+
+```{r dmediaP1}
+#| label: fig-dmediaP1Plot
+#| fig-cap: Distancia media al annulus blanco durante la primera prueba del MWM. Graficado con Media ± error estándar. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto.
+#| fig-scap: "Prueba-1 Distancia Media al Blanco"
+#| fig-pos: H
+#| out-width: "85%"
+
+df_filtered <- prepare_data(df_wm_flx, "P-1")
+
+anova_res <- df_filtered %>%
+      rstatix::anova_test(
+        dv = distancia_media_blanco,
+        wid = id,  
+        between = c("Tratamiento", "Estres"),
+        type = 3,
+        detailed = FALSE
+      )
+
+anova_table <- rstatix::get_anova_table(anova_res, correction = "auto")  %>%
+      rstatix::add_significance(
+        p.col = "p",
+        output.col = "valor.p",
+        cutpoints = c(0, 0.001, 0.01, 0.05, 1),
+        symbols = c("***", "**", "*", "ns")
+      ) %>%
+      rstatix::p_format(
+        accuracy = 0.001,
+        add.p = FALSE,
+        leading.zero = FALSE
+      )
+
+
+ anova_caption <- rstatix::get_test_label(anova_res, detailed = TRUE)
+
+ggplot(
+  df_filtered, aes(Estres, distancia_media_blanco, fill = Tratamiento)
+) +
+      stat_summary(
+        
+        fun = "mean",
+        geom = "col",
+        color = "black",
+        width = 0.8,
+        position = position_dodge(width = 0.85)
+      ) +
+      stat_summary(
+        fun.data = "mean_se",
+        geom = "errorbar",
+        width = 0.18,
+        size = 0.6,
+        position = position_dodge(width = 0.85)
+      ) +
+      scale_color_manual(values = c("#efc000", "#006A8E"), aesthetics = c("colour", "fill"))  +
+    theme_classic(base_size = 14) +
+    labs(x = "Estrés", y = "Distancia (m)", title = "Prueba-1 Distancia Media al Annulus", subtitle = anova_caption) +  # Add caption for ANOVA
+    theme(legend.position = "top", axis.text.x = element_text(angle = 0, hjust = 0.5))  + scale_y_continuous(
+      limits = c(0, 0.6),
+      expand = c(0, 0)
+    )
+
+
+```
+
+```{r dmediap1Tabla}
+
+# # Display the ANOVA table and plot
+
+anova_results <- as.tibble(anova_table) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA P-1 Distancia Media",
+              caption = "ANOVA Prueba-1 Distancia Media al Annulus") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"),  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) 
+# Show the ANOVA results
+# knitr::kable(rstatix::get_anova_table(analysis_results$anova_results, correction = "auto"))
+
+# knitr::kable(stat.test, 
+#               col.names=c("Tiempo","Estres", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "Latencias Originales Comparaciónes") %>%
+#         kable_classic_2("hover", full_width = F) 
+
+```
+
+
+### Prueba 2 - Efectos del estrés crónico y la fluoxetina en la memoria remota espacial
+
+::: {#fig-mapasp2 layout="[[25,25,25,25], [100]]" fig-pos='H'}
+
+![Salina](../Figures/mapa_calor_sal_ctrl_p2.png)
+
+![Flx](../Figures/mapa_calor_Flx_CUMS_p2.png)
+
+![Salina-CUMS](../Figures/mapa_calor_CUMS_p2.png)
+
+![Flx-CUMS](../Figures/mapa_calor_Flx_p2.png)
+
+![](../Figures/mapa_escala.png){fig-align="center"}
+
+Mapas de densidad (estimados por \ac{kde}) en la Prueba-2 en el \ac{mwm}. El círculo rosa rodeado por un borde negro en el cuadrante noreste representa la localización de la plataforma.
+
+::: 
+
+
+Para evaluar el efecto del estrés crónico y la fluoxetina en la retención remota de la memoria espacial, se compararon los tiempos de permanencia en los cuadrantes del laberinto de Morris durante la segunda prueba (memoria remota) (@fig-cuadrantesP2Plot). Esta prueba es evaluada 30 días después de la primera prueba de adquisición. El ANOVA mixto sugiere que no existe una interacción significativa entre `Tratamiento x Estrés x Preferencia` (`F(1, 25) = 0.339, p = 0.57`), sugiriendo que los grupos no difieren en la preferencia por el cuadrante en esta segunda prueba. 
+
+
+```{r cuadrantesP2}
+#| label: fig-cuadrantesP2Plot
+#| fig-cap: Tiempos de permanencia en los cuadrantes del laberinto de Morris durante la prueba 2. Linea punteada en el valor de 25% representa preferencia por dicho cuadrante. Graficado con Media ± error estándar. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto.
+#| fig-scap: "Prueba-2 Tiempo en Cuadrantes"
+#| fig-pos: H
+#| out-width: "90%"
+
+# Example of running the analysis
+analysis_results <- run_analysis(
+  df = df_wm_flx,
+  test_filter = "P-2",
+  cols_to_pivot = c("Blanco", "Opuestos"),
+  dv = "Porcentaje",
+  id_col = "id", 
+  use_custom_y_scale = TRUE,
+  within_col = "Preferencia",
+  between_cols = c("Tratamiento", "Estres"),
+  treatment_var = "Tratamiento",
+  facet_var = "Estres",  
+  geom = "col_pattern",  
+  x_lab_name = "Cuadrantes",
+  y_lab_name = "Tiempo de Ocupación",
+  hline_val = 15,
+  limy = 40,
+  strip_colors = c("#ffffff", "#e2345a")
+)
+
+plot <- analysis_results$plot
+
+anova_results <- analysis_results$anova_results
+
+
+# pwcmps <- prepare_data(df_wm_flx, "P-2", cols_to_pivot = c("Blanco", "Opuestos"), names_to = "cuadrantes", values_to = "Porcentaje")
+
+# stat.test <- pwcmps %>%
+#   group_by(Estres, cuadrantes) %>%
+#   rstatix::t_test(Porcentaje ~ Tratamiento) %>%
+#   rstatix::adjust_pvalue(method = "holm") %>%
+#   rstatix::add_significance()
+
+# comp_a <- data.frame(Tiempo = 1, latencia = 38, lab = "*",
+#                         Estres = factor("NO-Estrés", levels = c("NO-Estrés", "CUMS")) ,
+#                        Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+# comp_b <- data.frame(Tiempo = 2, latencia = 35, lab = "**",
+#                         Estres = factor("CUMS", levels = c("NO-Estrés", "CUMS")) ,
+#                        Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+plot <- plot +
+  # geom_text(data = comp_a, label = "*", colour = "#000000", size = 9) +
+  # geom_text(data = comp_b, label = "**", colour = "#000000", size = 9) +
+  labs(
+    title = "Prueba-2 Tiempo en Cuadrantes"
+    # caption = rstatix::create_test_label(
+    #   description = "Interacción Tratamiento x Cuadrante",
+    #   statistic.text = "F", 
+    #   parameter = "1, 29",
+    #   statistic = 1.987,
+    #   p = "0.17",
+    #   detailed = TRUE,
+    #   type = "expression"
+    # )
+  ) 
+
+
+# # Display the ANOVA table and plot
+customize_facet_strips(plot, strip_colors = c("#ffffff", "#e2345a"))
+
+# knitr::kable(anova_results, 
+#               col.names=c("Efecto","Dfn", "Dfd", "F", "p", "p<.05", "eta2", ""),
+#               digits = 3,
+#               caption = "ANOVA P-2 Cuadrantes") %>%
+#         footnote(alphabet = c("Between = Tratamiento, Estres",
+#                               "Within = Cuadrantes.")) %>%
+#         kable_classic_2("hover", full_width = F)
+```
+
+```{r cuadrantesp2Tabla}
+
+
+anova_results <- as.tibble(anova_results) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA P-2 Cuadrantes",
+              caption = "ANOVA Prueba-2 Cuadrantes") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"),  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) %>% 
+        # Add footnotes with better formatting
+      footnote(
+        number = c(
+          "$\\\\eta^2$ > 0.14 = Efecto grande, $\\\\eta^2$ > 0.06 = Efecto medio, $\\\\eta^2$ < 0.14 = Efecto pequeño",
+          # "$y = a+b;$", "$e = mc^2;$","\\\\%"
+          "  * = p < 0.05, ** = p < 0.01, *** = p < 0.001"
+        ),
+        escape = FALSE,
+        fixed_small_size = TRUE,
+        threeparttable = TRUE
+      ) 
+
+```
+
+También se analizaron los tiempos de permanencia en la zona (@fig-wmmedidas) objetivo del laberinto de Morris durante la segunda prueba (@fig-zonaP2Plot). El ANOVA mixto sugiere que no existe una interacción significativa entre `Tratamiento x Estrés x Preferencia` (`F(1, 25) = 0.041, p = 0.824`). Sin embargo, se encontró una interacción significativa y mediana entre `Estrés x Preferencia` (`F(1, 25) = 4.523, p = 0.043,` $\eta^2$  `= 0.067`) que sugiere que los ratones del grupo salina pasaron más tiempo en la zona objetivo que los ratones tratados con fluoxetina. Sin embargo, después de realizar las comparaciones múltiples (ajustadas con *Holm*), ningún valor *p ajustado* fue significativo. 
+
+```{r zonaP2}
+#| label: fig-zonaP2Plot
+#| fig-cap: Tiempos de permanencia en la zona objetivo del laberinto de Morris durante la segunda prueba. Linea punteada en el valor de 11% representa preferencia por dicha zona. Graficado con Media ± error estándar. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto.
+#| fig-scap: "P-2 Tiempo en Zonas"
+#| fig-pos: H
+#| out-width: "90%"
+
+# Example of running the analysis
+analysis_results <- run_analysis(
+  df = df_wm_flx,
+  test_filter = "P-2",
+  cols_to_pivot = c("zona_blanco", "zona_reversa"),
+  dv = "Porcentaje",
+  id_col = "id", 
+  use_custom_y_scale = TRUE,
+  within_col = "Preferencia",
+  between_cols = c("Tratamiento", "Estres"),
+  treatment_var = "Tratamiento",
+  facet_var = "Estres",  
+  geom = "col_pattern",  
+  x_lab_name = "Zona",
+  y_lab_name = "Tiempo de Ocupación",
+  hline_val = 6.6,
+  limy = 30,
+  strip_colors = c("#ffffff", "#e2345a")
+)
+
+anova_results <- analysis_results$anova_results
+plot <- analysis_results$plot
+
+# pwcmps <- prepare_data(df_wm_flx, "P-2", cols_to_pivot = c("zona_blanco", "zona_reversa"), names_to = "cuadrantes", values_to = "Porcentaje")
+
+# stat.test <- pwcmps %>%
+#   group_by(cuadrantes) %>%
+#   rstatix::t_test(Porcentaje ~ Estres) %>%
+#   rstatix::adjust_pvalue(method = "holm") %>%
+#   rstatix::add_significance()
+
+plot <- plot +
+  # geom_text(data = comp_a, label = "*", colour = "#000000", size = 9) +
+  # geom_text(data = comp_b, label = "**", colour = "#000000", size = 9) +
+  labs(
+    title = "Prueba-2 Tiempo en Zona"
+    # caption = rstatix::create_test_label(
+    #   description = "Interacción Tratamiento x Zona",
+    #   statistic.text = "F", 
+    #   parameter = "1, 29",
+    #   statistic = 1.494,
+    #   p = "0.125",
+    #   detailed = TRUE,
+    #   type = "expression"
+    # )
+  ) 
+
+# # Display the ANOVA table and plot
+customize_facet_strips(plot, strip_colors = c("#ffffff", "#e2345a"))
+
+# knitr::kable(anova_results, 
+#               col.names=c("Efecto","Dfn", "Dfd", "F", "p", "p<.05", "eta2", ""),
+#               digits = 3,
+#               caption = "ANOVA P-1 Cuadrantes") %>%
+#         footnote(alphabet = c("Between = Tratamiento, Estres",
+#                               "Within = Cuadrantes.")) %>%
+#         kable_classic_2("hover", full_width = F)
+
+```
+
+```{r zonp2tabla}
+
+# # Display the ANOVA table and plot
+
+anova_results <- as.tibble(anova_results) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA P-2 Zonas",
+              caption = "ANOVA Prueba-2 Zonas") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"),  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) %>% 
+        # Add footnotes with better formatting
+      footnote(
+        number = c(
+          "$\\\\eta^2$ > 0.14 = Efecto grande, $\\\\eta^2$ > 0.06 = Efecto medio, $\\\\eta^2$ < 0.14 = Efecto pequeño",
+          # "$y = a+b;$", "$e = mc^2;$","\\\\%"
+          "  * = p < 0.05, ** = p < 0.01, *** = p < 0.001"
+        ),
+        escape = FALSE,
+        fixed_small_size = TRUE,
+        threeparttable = TRUE
+      ) 
+# Show the ANOVA results
+# knitr::kable(rstatix::get_anova_table(analysis_results$anova_results, correction = "auto"))
+
+# knitr::kable(stat.test, 
+#               # col.names=c("Tiempo","Estres", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#             caption = "Latencias Originales Comparaciónes") %>%
+#         kable_classic_2("hover", full_width = F) 
+
+```
+
+
+Por último, se examinó la distancia media al annulus blanco durante la segunda prueba (@fig-dmediaP2Plot). El ANOVA de dos vías sugiere que la interacción `Tratamiento x Estrés` no es significativa (`F(1, 25) = 0.177, p = 0.677`), por lo que no existen diferencias significativas en la distancia al annulus blanco entre los grupos.
+
+```{r dmediaP2}
+#| label: fig-dmediaP2Plot
+#| fig-cap: Distancia media al annulus blanco durante la segunda prueba. Graficado con Media ± error estándar. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto.
+#| fig-scap: "Prueba-2 Distancia Media al Annulus"
+#| fig-pos: H
+#| out-width: "85%"
+
+df_filtered <- prepare_data(df_wm_flx, "P-2")
+
+anova_res <- df_filtered %>%
+      rstatix::anova_test(
+        dv = distancia_media_blanco,
+        wid = id,  
+        between = c("Tratamiento", "Estres"),
+        type = 3,
+        detailed = FALSE
+      )
+
+anova_table <- rstatix::get_anova_table(anova_res, correction = "auto")  %>%
+      rstatix::add_significance(
+        p.col = "p",
+        output.col = "valor.p",
+        cutpoints = c(0, 0.001, 0.01, 0.05, 1),
+        symbols = c("***", "**", "*", "ns")
+      ) %>%
+      rstatix::p_format(
+        accuracy = 0.001,
+        add.p = FALSE,
+        leading.zero = FALSE
+      )
+
+
+ anova_caption <- rstatix::get_test_label(anova_res, detailed = TRUE)
+
+ggplot(
+  df_filtered, aes(Estres, distancia_media_blanco, fill = Tratamiento)
+) +
+      stat_summary(
+        
+        fun = "mean",
+        geom = "col",
+        color = "black",
+        width = 0.8,
+        position = position_dodge(width = 0.85)
+      ) +
+      stat_summary(
+        fun.data = "mean_se",
+        geom = "errorbar",
+        width = 0.18,
+        size = 0.6,
+        position = position_dodge(width = 0.85)
+      ) +
+      scale_color_manual(values = c("#efc000", "#006A8E"), aesthetics = c("colour", "fill"))  +
+    theme_classic() +
+    labs(x = "Estrés", y = "Distancia (m)", title = "Prueba-2 Distancia Media al Annulus", subtitle = anova_caption) +  # Add caption for ANOVA
+    theme(legend.position = "top", axis.text.x = element_text(angle = 0, hjust = 0.5))  + scale_y_continuous(
+      limits = c(0, 0.8),
+      expand = c(0, 0)
+    )
+
+
+```
+
+```{r dmediap2Tabla}
+
+anova_results <- as.tibble(anova_table) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA P-2 Distancia Media",
+              caption = "ANOVA Prueba-2 Distancia Media al Annulus") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"),  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) %>% 
+        # Add footnotes with better formatting
+      footnote(
+        number = c(
+          "$\\\\eta^2$ > 0.14 = Efecto grande, $\\\\eta^2$ > 0.06 = Efecto medio, $\\\\eta^2$ < 0.14 = Efecto pequeño",
+          # "$y = a+b;$", "$e = mc^2;$","\\\\%"
+          "  * = p < 0.05, ** = p < 0.01, *** = p < 0.001"
+        ),
+        escape = FALSE,
+        fixed_small_size = TRUE,
+        threeparttable = TRUE
+      ) 
+# Show the ANOVA results
+# knitr::kable(rstatix::get_anova_table(analysis_results$anova_results, correction = "auto"))
+
+# knitr::kable(stat.test, 
+#               col.names=c("Tiempo","Estres", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "Latencias Originales Comparaciónes") %>%
+#         kable_classic_2("hover", full_width = F) 
+
+```
+
+
+<!-- ::: -->
+
+### Efectos del estrés crónico y la fluoexetina sobre el reaprendizaje de la memoria espacial
+
+Para evaluar el rendimiento de los grupos en la fase de reaprendizaje (posterior al \ac{cums}), se evalúo el rendimiento en un paradigma de aprendizaje reversa. Primero se compararon las latencias de escape (tiempo que tardan los ratones en localizar la plataforma) durante los dos días de entrenamiento (@fig-latenciaspost). El ANOVA mixto sugiere que no existe una interacción significativa entre `Tratamiento x Estrés x Preferencia` (`F(1, 25) = 1.858, p = 0.19`). Sin embargo, se observó una interacción significativa y mediana entre `Tratamiento x Estrés` (`F(1, 25) = 6.988, p = 0.014`, $\eta^2$ `= 0.057`) y pequeña entre `Tratamiento x Tiempo` (`F(1, 25) = 5.222, p = 0.031`, $\eta^2$ `= 0.042`). El efecto del tratamiento se analizó en cada tiempo para determina si existían diferencias entre los tratamientos ajustando. Los valores de p se ajustaron con el método de Holm para corregir evitar falsos positivos por comparaciones múltiples. En el gráfico (@fig-latenciaspost) se reportan las diferencias significativas de estas comparaciones, donde se observa que los ratones tratados con fluoxetina presentan menores latencias de escape en comparación con los ratones tratados con salina en el primer día.
+
+```{r latenciaspost}
+#| label: fig-latenciaspost
+#| fig-cap: Latencias de escape durante la fase de entrenamientos reversa. Las medias graficadas representan el tiempo que tardan los ratones en localizar la plataforma durante los días de entrenamiento. Graficado con Media ± error estándar. Se sobrepone un gráfico de dispersión que indica las observaciones individuales de cada grupo. Comparaciones múltiples (`Tratamiento x Tiempo`) ajustadas con Holm. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto. `* = p` $<$ `0.05`, `** = p` $<$ `0.01`, `*** = p` $<$ `0.001`.
+#| fig-scap: "Latencias de escape durante entrenamientos reversa"
+#| fig-pos: H
+
+# Run the analysis
+analysis_results <- run_analysis(
+  df = df_wm_flx, 
+  test_filter = "Reve", 
+  cols_to_pivot = NULL,  # Since we're not pivoting in this example
+  dv = "latencia", 
+  id_col = "id", 
+  use_custom_y_scale = FALSE, 
+  within_col = "Tiempo", 
+  between_cols = c("Tratamiento", "Estres"), 
+  treatment_var = "Tratamiento", 
+  facet_var = "Estres", 
+  geom = "line",  # Line plot
+  x_lab_name = "Tiempo", 
+  y_lab_name = "Latencia (seg)", 
+  hline_val = 0, 
+  limy = 60, 
+  strip_colors = c("#ffffff", "#e2345a")
+)
+
+# Access the results
+anova_results <- analysis_results$anova_results
+plot <- analysis_results$plot
+
+
+###
+
+# pwcmps <- prepare_data(df_wm_flx, "Reve")
+
+# stat.test <- pwcmps %>%
+#   group_by(Tiempo, Estres) %>%
+#   rstatix::t_test(latencia ~ Tratamiento) %>%
+#   rstatix::adjust_pvalue(method = "holm") %>%
+#   rstatix::add_significance()
+
+comp_a <- data.frame(Tiempo = 0, latencia = 48, lab = "***",
+                        Estres = factor("NO-Estrés", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+comp_b <- data.frame(Tiempo = 1, latencia = 25, lab = "***",
+                        Estres = factor("NO-Estrés", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+comp_c <- data.frame(Tiempo = 0, latencia = 44, lab = "*",
+                        Estres = factor("CUMS", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+comp_d <- data.frame(Tiempo = 1, latencia = 19, lab = "**",
+                        Estres = factor("CUMS", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+plot <- plot +
+  geom_text(data = comp_a, label = "***", colour = "#000000", size = 7) +
+  geom_text(data = comp_b, label = "***", colour = "#000000", size = 7) +
+  geom_text(data = comp_c, label = "*", colour = "#8b0101", size = 7) +
+  geom_text(data = comp_d, label = "**", colour = "#8b0101", size = 7) +
+  # geom_segment(aes(x = 0.8, xend = 1.2, 
+  #                 y = 30, yend = 30), linetype = "solid", color = "#107f80") +
+  labs(
+    title = "Latencias Reversa",
+    x = "Dia"
+    # caption = rstatix::create_test_label(
+    #   description = "Interacción Tratamiento x Estres",
+    #   statistic.text = "F", 
+    #   parameter = "1, 29",
+    #   statistic = 8.403,
+    #   p = "0.007",
+    #   effect.size = 0.067,
+    #   effect.size.text = quote(italic("eta^2")),
+    #   detailed = TRUE,
+    #   type = "expression"
+    # )
+  ) +
+  scale_x_continuous(breaks= c(0, 1), labels = c(1, 2), expand = c(0, 0))
+
+####
+
+
+# # Display the ANOVA table and plot
+customize_facet_strips(plot, strip_colors = c("#ffffff", "#e2345a"))
+
+# knitr::kable(anova_results, 
+#               col.names=c("Efecto","Dfn", "Dfd", "F", "p", "p<.05", "eta2", ""),
+#               digits = 3,
+#               caption = "ANOVA Latencias Reversa") %>%
+#         footnote(alphabet = c("Between = Tratamiento, Estres",
+#                               "Within = Tiempo.")) %>%
+#         kable_classic_2("hover", full_width = F)
+
+# # Show the ANOVA results
+# # knitr::kable(rstatix::get_anova_table(analysis_results$anova_results, correction = "auto"))
+
+# knitr::kable(stat.test, 
+#               col.names=c("Tiempo","Estres", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "Latencias Reversa Comparaciónes") %>%
+#         kable_classic_2("hover", full_width = F) 
+```
+
+```{r latenciaRevTabla}
+#| label: tbl-latenciaRevTabla
+
+anova_results <- as.tibble(anova_results) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA Latencias Reversa",
+              caption = "ANOVA Latencias Reversa") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"),  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) %>% 
+        # Add footnotes with better formatting
+      footnote(
+        number = c(
+          "$\\\\eta^2$ > 0.14 = Efecto grande, $\\\\eta^2$ > 0.06 = Efecto medio, $\\\\eta^2$ < 0.14 = Efecto pequeño",
+          # "$y = a+b;$", "$e = mc^2;$","\\\\%"
+          "  * = p < 0.05, ** = p < 0.01, *** = p < 0.001"
+        ),
+        escape = FALSE,
+        fixed_small_size = TRUE,
+        threeparttable = TRUE
+      ) 
+# Show the ANOVA results
+# knitr::kable(rstatix::get_anova_table(analysis_results$anova_results, correction = "auto"))
+
+# knitr::kable(stat.test, 
+#               col.names=c("Tiempo","Estres", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "Latencias Originales Comparaciónes") %>%
+#         kable_classic_2("hover", full_width = F) 
+
+```
+
+Para comprobar que el aprendizaje en esta etapa fuera dependiente del hipocampo (estrategias alocéntricas), se analizaron las estrategias de búsqueda utilizadas en estos entrenamientos iniciales (@fig-estrategiasPost). Para entender mejor la relación entre el uso de estrategias a través del tiempo en los distintos tratamientos, ajustamos una regresión de [Poisson](AppendixB.qmd#term-id-77) con efectos mixtos (utilizando [máxima verosimilitud](AppendixB.qmd#term-id-78)). La variable de respuesta es el número de tipo de estrategias, y las variables predictoras son el tiempo, tratamiento y estrés. Se incluyeron a los ratones como efectos mixtos para tomar en cuenta la dependencia de los datos en el tiempo (medidas repetidas). El modelo de regresión no presentó sobre-dispersión (*dispersion ratio* = 0.375), por lo que cumple con el supuesto de homogeneidad de varianza en los datos y el modelo. Dentro de este modelo, el efecto de interacción entre `Tratamiento x Estres x Estrategia (alocéntrica, egocéntrica, perseverancia)` no fue significativo ($X^2 (7) = 1.120, p = 0.992$). La interacción `Tiempo x Estrategia` tampoco fue significativa (prueba de razón de verosimilitud $X^2 (2) = 2.385, p = 0.303$). Este resultado sugiere que no existen diferencias significativas en el uso de estrategias a través del tiempo en los distintos tratamientos.
+
+
+```{r estrategiasPost}
+#| label: fig-estrategiasPost
+#| fig-cap: Estrategias de búsqueda durante la fase de entrenamientos reversa. Las medias graficadas representan el estimado de estrategias utilizadas por tratamiento en cada día de los entrenamientos (4 pruebas por día). Las medias marginales están calculadas a tres niveles, prueba, tratamientos y tipo de estrategia. Graficado con Media ± error estándar.
+#| fig-scap: "Estrategias de búsqueda durante los entrenamientos reversa"
+#| fig-pos: H
+#| out-width: "90%"
+
+p <- estrategias_df_post %>%
+  mutate(estrategias_hipo = fct_relevel(estrategias_hipo, "Perseverancia", "Egocéntricas", "Alocéntricas")) %>%
+  ggplot( 
+      aes(fill=estrategias_hipo, 
+          y=emmean, x=dia)) + 
+    geom_bar(position="fill", stat="identity", color = "black") +
+    facet_grid(Estres ~ Tratamiento.Farm) +
+    scale_fill_manual(values = alpha(c("#d2adff", "#EA5455", "#2D4059"), 0.7)) +
+    scale_y_continuous(labels = c("0", "1", "2", "3", "4")) +  # Adjust y-axis limits for divergence
+    scale_x_continuous(breaks = c(1, 2)) +
+    ggthemes::theme_clean(base_size = 14)+
+    theme(legend.position = "top") +
+    guides(fill = guide_legend(title = "")) +
+    labs(x = "Día", y = "Número Estrategias", title = "Estrategias de búsqueda - Reversa") 
+
+
+customize_facet_strips(p, strip_colors = c("#ffffff", "#cad0d2", "#ffffff", "#e2345a"))
+
+
+```
+
+
+***Prueba Reversa***
+
+::: {#fig-mapasprevs layout="[[25,25,25,25], [100]]" fig-pos='H'}
+
+![Salina](../Figures/mapa_calor_sal_ctrl_prev.png)
+
+![Flx](../Figures/mapa_calor_Flx_prev.png)
+
+![Salina-CUMS](../Figures/mapa_calor_CUMS_prev.png)
+
+![Flx-CUMS](../Figures/mapa_calor_Flx_cums_prev.png)
+
+![](../Figures/mapa_escala.png){fig-align="center"}
+
+Mapas de densidad (estimados por *KDE*) en la Prueba-3 (*Reversa*) en el \ac{mwm}. El círculo rosa rodeado por un borde negro en el cuadrante suroeste representa la localización de la plataforma reversa. El círculo rosa *sin* borde negro representa la localización de la plataforma original en el cuadrante noreste.
+
+:::
+
+Para evaluar el aprendizaje espacial en esta última prueba, se compararon los tiempos de permanencia en los cuadrantes del laberinto de Morris durante la prueba de **reversa** (@fig-cuadrantesPRevPlot). El ANOVA mixto sugiere que no existe una interacción significativa entre `Tratamiento x Estrés x Preferencia` (`F(1, 25) = 2.061, p = 0.16`). Por lo contrario, se encontró una interacción significativa y grande entre `Tratamiento x Preferencia` (`F(1, 25) = 42.984, p < 0.001`, $\eta^2$ `= 0.271`). El resultado sugiere que los ratones tratados con fluoxetina pasan más tiempo en el cuadrante objetivo en comparación con los ratones del grupo de salina.
+
+```{r cuadrantesPrev}
+#| label: fig-cuadrantesPRevPlot
+#| fig-cap: Tiempos de permanencia en los cuadrantes del laberinto de Morris durante la prueba reversa. Línea punteada en el valor de 25% representa preferencia por dicho cuadrante. Graficado con Media ± error estándar. Comparaciones múltiples (`Tratamiento x Preferencia`) ajustadas con Holm. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto. `* = p` $<$ `0.05`, `** = p` $<$ `0.01`, `*** = p` $<$ `0.001`.
+#| fig-scap: "P-Rev Tiempo en Cuadrantes"
+#| fig-pos: H
+#| out-width: "95%"
+
+# Example of running the analysis
+analysis_results <- run_analysis(
+  df = df_wm_flx,
+  test_filter = "P-Rev",
+  cols_to_pivot = c("Blanco", "Opuestos"),
+  dv = "Porcentaje",
+  id_col = "id", 
+  use_custom_y_scale = TRUE,
+  within_col = "Preferencia",
+  between_cols = c("Tratamiento", "Estres"),
+  treatment_var = "Tratamiento",
+  facet_var = "Estres",  
+  geom = "col_pattern",  
+  x_lab_name = "Cuadrantes",
+  y_lab_name = "Tiempo de Ocupación",
+  hline_val = 15,
+  limy = 40,
+  strip_colors = c("#ffffff", "#e2345a")
+)
+
+anova_results <- analysis_results$anova_results
+plot <- analysis_results$plot
+
+# pwcmps <- prepare_data(df_wm_flx, "P-Rev", cols_to_pivot = c("Blanco", "Opuestos"), names_to = "cuadrantes", values_to = "Porcentaje")
+
+# stat.test <- pwcmps %>%
+#   group_by(Estres, cuadrantes) %>%
+#   rstatix::t_test(Porcentaje ~ Tratamiento) %>%
+#   rstatix::adjust_pvalue(method = "holm") %>%
+#   rstatix::add_significance()
+
+
+comp_a <- data.frame(Preferencia = "Blanco", Porcentaje = 26, lab = "*",
+                        Estres = factor("NO-Estrés", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+comp_b <- data.frame(Preferencia = "Opuestos", Porcentaje = 23, lab = "*",
+                        Estres = factor("NO-Estrés", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+comp_c <- data.frame(Preferencia = "Blanco", Porcentaje = 25, lab = "**",
+                        Estres = factor("CUMS", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+comp_d <- data.frame(Preferencia = "Opuestos", Porcentaje = 21, lab = "*",
+                        Estres = factor("CUMS", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+
+
+plot <- plot +
+  geom_text(data = comp_a, label = "*", colour = "#000000", size = 7) +
+  geom_text(data = comp_b, label = "*", colour = "#000000", size = 7) +
+  geom_text(data = comp_c, label = "**", colour = "#8b0101", size = 7) +
+  geom_text(data = comp_d, label = "*", colour = "#8b0101", size = 7) +
+  geom_segment(aes(x = 3, y = 35, xend = 1, yend = 35)) +
+  geom_segment(aes(x = 4, y = 32, xend = 2, yend = 32), linetype = 4) +
+  
+  geom_segment(aes(x = 3, y = 35, xend = 3, yend = 34.5)) +
+  geom_segment(aes(x = 1, y = 35, xend = 1, yend = 32)) +
+
+  geom_segment(aes(x = 4, y = 32, xend = 4, yend = 23), linetype = 4) +
+  geom_segment(aes(x = 2, y = 32, xend = 2, yend = 27), linetype = 4) +
+  
+  labs(
+    title = "Prueba-Reversa Cuadrantes"
+    # caption = rstatix::create_test_label(
+    #   description = "Interacción Tratamiento x Cuadrante",
+    #   statistic.text = "F", 
+    #   parameter = "1, 29",
+    #   statistic = 27.046,
+    #   p = "<0.001",
+    #   effect.size = 0.176,
+    #   effect.size.text = quote(italic("eta^2")),
+    #   detailed = TRUE,
+    #   type = "expression"
+    # )
+  ) 
+
+
+# # Display the ANOVA table and plot
+customize_facet_strips(plot, strip_colors = c("#ffffff", "#e2345a"))
+
+# knitr::kable(anova_results)
+
+# ggplot(pwcmps, aes(x = cuadrantes, y = Porcentaje, color = Tratamiento, group = Tratamiento)) +
+#   stat_summary(fun = mean, geom = "line", size = 1) +
+#   stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.2) +
+#   labs(x = "Cuadrantes", y = "Porcentaje", color = "Tratamiento") +
+#   scale_color_manual(values = c("#bba800", "#025774")) +
+#   theme_classic()
+
+
+# knitr::kable(anova_results, 
+#               col.names=c("Efecto","Dfn", "Dfd", "F", "p", "p<.05", "eta2", ""),
+#               digits = 3,
+#               caption = "ANOVA P-Rev Cuadrantes") %>%
+#         footnote(alphabet = c("Between = Tratamiento, Estres",
+#                               "Within = Cuadrantes.")) %>%
+#         kable_classic_2("hover", full_width = F)
+
+# knitr::kable(stat.test, 
+#               col.names=c("Estres", "Cuadrantes", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "P-Rev Cuadrantes Comparaciónes") %>%
+#               footnote("Comparaciones para explorar la significancia de Tratamiento x Cuadrantes") %>% 
+#         kable_classic_2("hover", full_width = T)  
+
+
+```
+
+
+```{r cuadrantesRevTabla}
+
+anova_results <- as.tibble(anova_results) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA P-Reversa Cuadrantes",
+              caption = "ANOVA Prueba-Reversa Cuadrantes") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"),  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) %>% 
+        # Add footnotes with better formatting
+      footnote(
+        number = c(
+          "$\\\\eta^2$ > 0.14 = Efecto grande, $\\\\eta^2$ > 0.06 = Efecto medio, $\\\\eta^2$ < 0.14 = Efecto pequeño",
+          # "$y = a+b;$", "$e = mc^2;$","\\\\%"
+          "  * = p < 0.05, ** = p < 0.01, *** = p < 0.001"
+        ),
+        escape = FALSE,
+        fixed_small_size = TRUE,
+        threeparttable = TRUE
+      ) 
+
+```
+
+
+
+Adicionalmente, se compararon los tiempos de permanencia en la zona (@fig-wmmedidas) objetivo del laberinto de Morris durante la prueba **reversa** (@fig-zonaPRevPlot). El ANOVA mixto sugiere que no existe una interacción significativa entre `Tratamiento x Estrés x Preferencia` (`F(1, 25) = 0.995, p = 0.33`). Se encontró una interacción significativa y grande entre `Tratamiento x Preferencia` (`F(1, 25) = 35.567, p < 0.001`, $\eta^2$ `= 0.348`). Este resultado también evidencía que los ratones tratados con fluoxetina pasan más tiempo en la zona objetivo cn comparación con los ratones tratados con salina.
+
+```{r zonaPRev}
+#| label: fig-zonaPRevPlot
+#| fig-cap: Tiempos de permanencia en la zona objetivo del laberinto de Morris durante la prueba reversa. Línea punteada en el valor de 11% representa preferencia por dicha zona. Graficado con Media ± error estándar. Comparaciones múltiples (`Tratamiento x Preferencia`) ajustadas con Holm. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto. `* = p` $<$ `0.05`, `** = p` $<$ `0.01`, `*** = p` $<$ `0.001`.
+#| fig-scap: "P-Rev Tiempo en Zonas"
+#| fig-pos: H
+#| out-width: "90%"
+
+# Example of running the analysis
+analysis_results <- run_analysis(
+  df = df_wm_flx,
+  test_filter = "P-Rev",
+  cols_to_pivot = c("zona_blanco", "zona_reversa"),
+  dv = "Porcentaje",
+  id_col = "id", 
+  use_custom_y_scale = TRUE,
+  within_col = "Preferencia",
+  between_cols = c("Tratamiento", "Estres"),
+  treatment_var = "Tratamiento",
+  facet_var = "Estres",  
+    geom = "col_pattern",  
+  x_lab_name = "Zona",
+  y_lab_name = "Tiempo de Ocupación",
+  hline_val = 6.6,
+  limy = 30,
+  strip_colors = c("#ffffff", "#e2345a")
+)
+anova_results <- analysis_results$anova_results
+plot <- analysis_results$plot
+
+
+
+# pwcmps <- prepare_data(df_wm_flx, "P-Rev", cols_to_pivot = c("zona_blanco", "zona_reversa"), names_to = "cuadrantes", values_to = "Porcentaje")
+
+# stat.test <- pwcmps %>%
+#   group_by(Estres, cuadrantes) %>%
+#   rstatix::t_test(Porcentaje ~ Tratamiento) %>%
+#   rstatix::adjust_pvalue(method = "holm") %>%
+#   rstatix::add_significance()
+
+comp_a <- data.frame(Preferencia = "zona_blanco", Porcentaje = 17, lab = "*",
+                        Estres = factor("NO-Estrés", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+comp_b <- data.frame(Preferencia = "zona_reversa", Porcentaje =15, lab = "*",
+                        Estres = factor("NO-Estrés", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+comp_c <- data.frame(Preferencia = "zona_blanco", Porcentaje = 17, lab = "***",
+                        Estres = factor("CUMS", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+comp_d <- data.frame(Preferencia = "zona_reversa", Porcentaje = 14, lab = "*",
+                        Estres = factor("CUMS", levels = c("NO-Estrés", "CUMS")) ,
+                       Tratamiento = factor("Salina",levels = c("Salina","Fluoxetina")))
+
+
+
+plot <- plot +
+  geom_text(data = comp_a, label = "*", colour = "#000000", size = 7) +
+  geom_text(data = comp_b, label = "*", colour = "#000000", size = 7) +
+  geom_text(data = comp_c, label = "***", colour = "#8b0101", size = 7) +
+  geom_text(data = comp_d, label = "*", colour = "#8b0101", size = 7) +
+
+  geom_segment(aes(x = 3, y = 24.5, xend = 1, yend = 24.5)) +
+  geom_segment(aes(x = 4, y = 23.5, xend = 2, yend = 23.5), linetype = 4) +
+  
+  geom_segment(aes(x = 3, y = 24.5, xend = 3, yend = 23.3)) +
+  geom_segment(aes(x = 1, y = 24.5, xend = 1, yend = 21)) +
+
+  geom_segment(aes(x = 4, y = 23.5, xend = 4, yend = 14), linetype = 4) +
+  geom_segment(aes(x = 2, y = 23.5, xend = 2, yend = 18), linetype = 4) +
+
+labs(
+    title = "Prueba-Rev Zona"
+    # caption = rstatix::create_test_label(
+    #   description = "Interacción Tratamiento x Zona",
+    #   statistic.text = "F", 
+    #   parameter = "1, 29",
+    #   statistic = 28.806,
+    #   p = "<0.001",
+    #   effect.size = 0.265,
+    #   effect.size.text = quote(italic("eta^2")),
+    #   detailed = TRUE,
+    #   type = "expression"
+    # )
+  ) 
+
+
+
+# # Display the ANOVA table and plot
+customize_facet_strips(plot, strip_colors = c("#ffffff", "#e2345a"))
+
+# knitr::kable(anova_results, 
+#               col.names=c("Efecto","Dfn", "Dfd", "F", "p", "p<.05", "eta2", ""),
+#               digits = 3,
+#               caption = "ANOVA P-Rev Zona") %>%
+#         footnote(alphabet = c("Between = Tratamiento, Estres",
+#                               "Within = Zona(cuadrante).")) %>%
+#         kable_classic_2("hover", full_width = F)
+
+# knitr::kable(stat.test, 
+#               col.names=c("Estres", "Zona", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "P-REv Zona Comparaciónes") %>%
+#               footnote("Comparaciones para explorar la significancia de Tratamiento x Cuadrantes") %>% 
+#         kable_classic_2("hover", full_width = T)  
+
+
+```
+
+```{r zonpRevtabla}
+
+anova_results <- as.tibble(anova_results) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA P-Reversa Zonas",
+              caption = "ANOVA P-Reversa Zonas") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"),  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) %>% 
+        # Add footnotes with better formatting
+      footnote(
+        number = c(
+          "$\\\\eta^2$ > 0.14 = Efecto grande, $\\\\eta^2$ > 0.06 = Efecto medio, $\\\\eta^2$ < 0.14 = Efecto pequeño",
+          # "$y = a+b;$", "$e = mc^2;$","\\\\%"
+          "  * = p < 0.05, ** = p < 0.01, *** = p < 0.001"
+        ),
+        escape = FALSE,
+        fixed_small_size = TRUE,
+        threeparttable = TRUE
+      ) 
+# Show the ANOVA results
+# knitr::kable(rstatix::get_anova_table(analysis_results$anova_results, correction = "auto"))
+
+# knitr::kable(stat.test, 
+#               col.names=c("Tiempo","Estres", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "Latencias Originales Comparaciónes") %>%
+#         kable_classic_2("hover", full_width = F) 
+
+```
+
+
+Finalmente, se examinó la distancia media al annulus blanco durante la prueba  **reversa** (@fig-dmediaPRevPlot). El ANOVA de dos vías sugiere que no existe una interacción significativa entre `Tratamiento x Estrés` (`F(1, 25) = 0.154, p = 0.7`), por lo que no hay suficiente evidencia para sugerir que el tratamiento o el estrés afecten la distancia media al annulus blanco en esta tercera prueba.
+
+```{r dmediaPRev}
+#| label: fig-dmediaPRevPlot
+#| fig-cap: Distancia media al *annulus* blanco durante prueba reversa. Graficado con Media ± error estándar. Como subtítulo del gráfico se presenta el valor de la interacción del ANOVA Mixto.
+#| fig-scap: "P-Rev Distancia Media al Annulus"
+#| fig-pos: H
+#| out-width: "85%"
+
+df_filtered <- prepare_data(df_wm_flx, "P-Rev")
+
+anova_res <- df_filtered %>%
+      rstatix::anova_test(
+        dv = distancia_media_blanco,
+        wid = id,  
+        between = c("Tratamiento", "Estres"),
+        type = 3,
+        detailed = FALSE
+      )
+
+anova_table <- rstatix::get_anova_table(anova_res, correction = "auto")  %>%
+      rstatix::add_significance(
+        p.col = "p",
+        output.col = "valor.p",
+        cutpoints = c(0, 0.001, 0.01, 0.05, 1),
+        symbols = c("***", "**", "*", "ns")
+      ) %>%
+      rstatix::p_format(
+        accuracy = 0.001,
+        add.p = FALSE,
+        leading.zero = FALSE
+      )
+
+
+anova_caption <- rstatix::get_test_label(anova_res, detailed = TRUE)
+
+ggplot(
+  df_filtered, aes(Estres, distancia_media_blanco, fill = Tratamiento)
+) +
+      stat_summary(
+        
+        fun = "mean",
+        geom = "col",
+        color = "black",
+        width = 0.8,
+        position = position_dodge(width = 0.85)
+      ) +
+      stat_summary(
+        fun.data = "mean_se",
+        geom = "errorbar",
+        width = 0.18,
+        size = 0.6,
+        position = position_dodge(width = 0.85)
+      ) +
+      scale_color_manual(values = c("#efc000", "#006A8E"), aesthetics = c("colour", "fill"))  +
+    theme_classic(base_size = 13) +
+    labs(x = "Estrés", y = "Distancia (m)", title = "Prueba-Rev. Distancia Media al Annulus", subtitle = anova_caption) +  # Add caption for ANOVA
+    theme(legend.position = "top", axis.text.x = element_text(angle = 0, hjust = 0.5))  + scale_y_continuous(
+      limits = c(0, 0.6),
+      expand = c(0, 0)
+    )
+
+
+```
+
+```{r dmediapRevTabla}
+
+anova_results <- as.tibble(anova_table) %>% 
+  dplyr::select(!ends_with("05")) %>%
+  relocate(valor.p, .after = p)
+
+knitr::kable(anova_results, 
+              col.names=c("Efecto","Dfn", "Dfd", "F", "p", "", "$\\eta^2$"),
+              digits = 3,
+              format = "latex", 
+              escape = FALSE,
+              booktabs = TRUE,
+              caption.short = "ANOVA Prueba-Rev Distancia Media",
+              caption = "ANOVA Prueba-Reversa Distancia Media") %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position"),  
+        full_width = FALSE,
+        font_size = 10
+      ) %>%
+      # Bold the first column (Efecto)
+      column_spec(1, bold = TRUE) %>%
+      column_spec(6, bold = TRUE) %>% 
+        # Add footnotes with better formatting
+      footnote(
+        number = c(
+          "$\\\\eta^2$ > 0.14 = Efecto grande, $\\\\eta^2$ > 0.06 = Efecto medio, $\\\\eta^2$ < 0.14 = Efecto pequeño",
+          # "$y = a+b;$", "$e = mc^2;$","\\\\%"
+          "  * = p < 0.05, ** = p < 0.01, *** = p < 0.001"
+        ),
+        escape = FALSE,
+        fixed_small_size = TRUE,
+        threeparttable = TRUE
+      ) 
+# Show the ANOVA results
+# knitr::kable(rstatix::get_anova_table(analysis_results$anova_results, correction = "auto"))
+
+# knitr::kable(stat.test, 
+#               col.names=c("Tiempo","Estres", "Y", "Trat.1", "Trat.2", "Obs.1", "Obs.2", "Estadístico.t", "df", "p", "p.ajustada", ""),
+#               digits = 3,
+#               caption = "Latencias Originales Comparaciónes") %>%
+#         kable_classic_2("hover", full_width = F) 
+
+```
+
+
+### Evolución de la Memoria Espacial
+
+Para comprender y modelar las medias y términos de errores a través de las 3 pruebas (interacción `tiempo x tratamiento x estrés`), ajustamos un modelo lineal mixto (estimado usando [REML](AppendixB.qmd#term-id-83)) para predecir la distancia media al blanco a partir de la prueba, tratamientos y estrés (@fig-distanciaMedia). El modelo incluyó a los sujetos como efecto aleatorio. La prueba de razón de [verosimilitud](AppendixB.qmd#term-id-73) o *likelihood ratio* determinó que la interacción entre `Prueba x Tratamiento x Estrés` es significativa ($X^2 (7) = 29.42, p < 0.001$). La prueba de comparaciones múltiples (ajustada con Tukey HSD)  indica que en la **Prueba reversa**, el grupo `Salina` difiere significativamente del grupo `Fluoxetina`, tanto en el grupo `No-estrés` ($p = 0.006$) como del grupo `CUMS` ($p = 0.0012$). El resultado sugiere que los ratones tratados con fluoxetina se encuentran más cerca del annulus en comparación con los ratones del grupo de salina en la prueba reversa.
+
+Para predecir la entropia a partir de la `prueba x tratamiento x estrés`, ajustamos un modelo lineal mixto (estimado usando [REML](AppendixB.qmd#term-id-83)) (@fig-entropiatodos). El modelo incluyó a los sujetos como efecto aleatorio. El poder explicativo del modelo es sustancial ([R2 condicional](AppendixB.qmd#term-id-86) `= 0.72`). La prueba de razón de verosimilitud o *likelihood ratio* determinó que la interacción entre `Prueba x Tratamiento` no es significativa ($X^2 (4) = 8.9, p = 0.06$). El resultado sugiere que la entropía no es afectada significativamente por el tratamiento en las pruebas del \ac{mwm}.
+
+Por último, para predecir el tiempo en la zona blanco a partir de la `prueba x tratamiento x estrés`, ajustamos un modelo lineal mixto (estimado usando [REML](AppendixB.qmd#term-id-83)) (@fig-zonainteraccion). El modelo incluyó a los sujetos como efecto aleatorio. La prueba de razón de [verosimilitud](AppendixB.qmd#term-id-73) o *likelihood ratio* determinó que la interacción entre `Prueba x Tratamiento x Estrés` es significativa ($X^2 (7) = 26.384, p < 0.001$). La prueba de comparaciones múltiples (ajustada con Tukey HSD)  indica que en la **Prueba reversa**, el grupo `Salina` difiere significativamente del grupo `Fluoxetina`, tanto en el grupo `No-estrés` ($p = 0.0033$) como del grupo `CUMS` ($p = 0.001$). El resultado sugiere que los ratones tratados con fluoxetina pasan más tiempo en la zona objetivo en comparación con los ratones del grupo de salina en la prueba reversa.
+
+
+```{r distanciaMedia}
+#| label: fig-distanciaMedia
+#| fig-cap: Distancia media al *annulus* durante las pruebas de adquisición, retención y reversa. Las medias graficadas representan el estimado a partir del modelo lineal mixto. Graficado con Media ± error estándar. Comparaciones múltiples con método Tukey-HSD (`Prueba|Tratamiento|Estrés`). `* = p` $<$ `0.05`, `** = p` $<$ `0.01`, `*** = p` $<$ `0.001`.
+#| fig-scap: "Distancia Media al annulus en pruebas"
+#| fig-pos: H
+#| out-width: "95%"
+
+anova_lmer <- function(datos, prueba_filter, formula){
+
+  # Asegúrate de convertir las variables a factores correctamente
+  df <- datos %>%
+    dplyr::filter(str_detect(prueba, prueba_filter)) 
+
+  # Ajusta el modelo lineal
+  model <- lmerTest::lmer(formula, data = df)
+
+  # Obtén el ANOVA
+  anova_results <- anova(model)
+
+  anova_table <- rstatix::get_anova_table(anova_results)
+
+  return(anova_table)
+}
+
+# Define tu fórmula
+mi_formula <- distancia_media_blanco ~ Tratamiento * Estres * prueba + (1 | id)
+
+# Llama a la función
+latencia.pre.lmer <- anova_lmer(datos = df_wm_flx, prueba_filter = "P-" , formula = mi_formula)
+
+# Ver resultados
+# knitr::kable(latencia.pre.lmer, 
+        #       # col.names=c("Efecto","Df", "SumSq", "MeanSq", "F", "p", "p<.05"),
+        #       digits = 3,
+        #       caption = "Distancia Media - Modelo de efectos mixtos") %>%
+        # footnote(alphabet = c("Tratamiento x Estres x Prueba",
+        #                 "Efectos mixtos: sujetos")) %>%
+        # kable_classic_2("hover", full_width = F)
+
+
+mi_formulalmer <- lme4::lmer(distancia_media_blanco ~ Tratamiento * Estres * prueba + (1 | id), data = df_wm_flx)
+
+# summary(mi_formulalmer)
+# library(interactions)
+# library(emmeans)
+# plot(effects::allEffects(mi_formulalmer, grid = TRUE))
+
+# interact_plot(mi_formulalmer, pred = prueba, modx = Tratamiento, mod2 = Estres, interval = TRUE) + 
+#   jtools::theme_apa(legend.pos = "topright")
+
+cat_plot(
+  mi_formulalmer, 
+  pred = prueba, 
+  modx = Tratamiento, 
+  mod2 = Estres, 
+  geom = "line", 
+  point.shape = TRUE, 
+  errorbar.width = 0.4,
+  # robust = TRUE,
+  # colors = "Set2",
+  x.label = "Prueba", 
+  y.label = "Distancia Media",
+  main.title = "Distancia Media",  
+  # legend.main = "Custom Legend Title",
+  colors = c("#bba800", "#006A8E"), 
+  interval = TRUE)  + 
+  jtools::theme_apa(legend.pos = "top") +
+  ggplot2::scale_y_continuous(
+      limits = c(0, 0.8)
+    ) +
+  annotate(
+    "text", label = "**",
+    x = 3, y = 0.5, size = 7, colour = "black"
+  )
+
+
+# Perform post-hoc analysis on the Tratamiento:prueba interaction
+# emmeans_results <- emmeans(mi_formulalmer, ~ Tratamiento | prueba)
+
+# # Explore pairwise comparisons for the interaction
+# pairwise_comparison <- contrast(emmeans_results, method = "pairwise", adjust = "tukey")
+
+# Assuming pairwise_comparison is your emmeans object
+# significant_results <- pairwise_comparison %>%
+#   as.data.frame() %>%  # Convert to data frame if not already
+#   filter(p.value <= 0.05)  # Filter for significant results
+
+# Print the table using kable
+# kable(significant_results, 
+#       caption = "DMedia Comparaciones sign. (p-value ≤ 0.05)", 
+#       col.names = c("Contraste", "Prueba", "Estimado", "SE", "df", "t Ratio", "p"), 
+#       digits = 3)  %>%
+#       footnote("Ajustado con Tukey") %>%
+#       kable_classic_2("hover", full_width = F)
+
+```
+
+```{r entropiatodos}
+#| label: fig-entropiatodos
+#| fig-cap: Entropía al *annulus* durante las pruebas de adquisición, retención y reversa. Las medias graficadas representan el estimado a partir del modelo lineal mixto. Graficado con Media ± error estándar.
+#| fig-scap: "Entropía en Pruebas"
+#| fig-pos: H
+#| out-width: "95%"
+
+entropia %>%
+  mutate(Estres = fct_relevel(Estres, "NO-Estrés", "CUMS")) %>%
+  ggplot(aes(x = dia, y = entropia_blanco, 
+              shape = Tratamiento.Farm,
+              color = Tratamiento.Farm,
+              fill = Tratamiento.Farm
+              )) +
+  stat_summary(fun = "mean", geom = "line", position = position_dodge(width = 0.1), size = 1) +
+  stat_summary(fun = "mean", geom = "point", position = position_dodge(width = 0.1), size = 3) +
+  stat_summary(fun.data = "mean_se", geom = "errorbar", width = 0.18, size = 0.6, position = position_dodge(width = 0.1)) +
+  facet_grid( ~ Estres ) +
+  scale_color_manual(values = c("#a99800", "#006A8E"), aesthetics = c("colour", "fill")) +
+  # scale_shape_manual(values = c(10, 17)) +
+  # scale_y_continuous(limits = c(0, 4.5), guide = "prism_offset_minor") +
+  labs(x = "Día", title = "Entropía",
+          y = "H") +
+  jtools::theme_apa(legend.pos = "top") + 
+  guides(shape = guide_legend(title = ""),
+        fill = guide_legend(title = ""),
+        color = guide_legend(title = "")) +
+  theme(legend.position = "top") +
+  scale_y_continuous(
+      limits = c(15, 19)
+    ) +
+  scale_x_continuous(n.breaks=3, labels=c("P-1","P-2", "P-Rev"))
+
+```
+
+```{r zonainteraccion}
+#| label: fig-zonainteraccion
+#| fig-cap: Tiempo en zona blanco durante las pruebas de adquisición, retención y reversa. Las medias graficadas representan el estimado a partir del modelo lineal mixto. Graficado con Media ± error estándar. Comparaciones múltiples con método Tukey-HSD (`Prueba|Tratamiento|Estrés`). `* = p` $<$ `0.05`, `** = p` $<$ `0.01`, `*** = p` $<$ `0.001`.
+#| fig-scap: "Tiempo en Cuadrantes en pruebas"
+#| fig-pos: H
+#| out-width: "95%"
+
+anova_lmer <- function(datos, prueba_filter, formula){
+
+  # Asegúrate de convertir las variables a factores correctamente
+  df <- datos %>%
+    dplyr::filter(str_detect(prueba, prueba_filter)) 
+
+  # Ajusta el modelo lineal
+  model <- lmerTest::lmer(formula, data = df)
+
+  # Obtén el ANOVA
+  anova_results <- anova(model)
+
+  anova_table <- rstatix::get_anova_table(anova_results)
+
+  return(anova_table)
+}
+
+# Define tu fórmula
+mi_formula <- distancia_media_blanco ~ Tratamiento * Estres * prueba + (1 | id)
+
+# Llama a la función
+latencia.pre.lmer <- anova_lmer(datos = df_wm_flx, prueba_filter = "P-" , formula = mi_formula)
+
+# Ver resultados
+# knitr::kable(latencia.pre.lmer, 
+        #       # col.names=c("Efecto","Df", "SumSq", "MeanSq", "F", "p", "p<.05"),
+        #       digits = 3,
+        #       caption = "Distancia Media - Modelo de efectos mixtos") %>%
+        # footnote(alphabet = c("Tratamiento x Estres x Prueba",
+        #                 "Efectos mixtos: sujetos")) %>%
+        # kable_classic_2("hover", full_width = F)
+
+
+mi_formulalmer <- lme4::lmer(zona_blanco ~ Tratamiento * Estres * prueba + (1 | id), data = df_wm_flx)
+
+# summary(mi_formulalmer)
+# library(interactions)
+# library(emmeans)
+# plot(effects::allEffects(mi_formulalmer, grid = TRUE))
+
+# interact_plot(mi_formulalmer, pred = prueba, modx = Tratamiento, mod2 = Estres, interval = TRUE) + 
+#   jtools::theme_apa(legend.pos = "topright")
+
+cat_plot(
+  mi_formulalmer, 
+  pred = prueba, 
+  modx = Tratamiento, 
+  mod2 = Estres, 
+  geom = "line", 
+  point.shape = TRUE, 
+  errorbar.width = 0.4,
+  # robust = TRUE,
+  # colors = "Set2",
+  x.label = "Prueba", 
+  y.label = "Ocupación",
+  main.title = "Tiempo en zona blanco",  
+  # legend.main = "Custom Legend Title",
+  colors = c("#bba800", "#006A8E"), 
+  interval = TRUE)  + 
+  jtools::theme_apa(legend.pos = "top") +
+  ggplot2::scale_y_continuous(
+      labels = function(x) paste0(round(x * 100 / 60, 0), "%"),
+      breaks = function(limits) seq(0, 60, by = 12),
+      limits = c(0, 50),
+      expand = c(0, 0)
+    ) +
+  annotate(
+    "text", label = "**",
+    x = 3, y = 27, size = 7, colour = "black"
+  )
+
+
+# Perform post-hoc analysis on the Tratamiento:prueba interaction
+# emmeans_results <- emmeans(mi_formulalmer, ~ Tratamiento | prueba)
+
+# # Explore pairwise comparisons for the interaction
+# pairwise_comparison <- contrast(emmeans_results, method = "pairwise", adjust = "tukey")
+
+# Assuming pairwise_comparison is your emmeans object
+# significant_results <- pairwise_comparison %>%
+#   as.data.frame() %>%  # Convert to data frame if not already
+#   filter(p.value <= 0.05)  # Filter for significant results
+
+# Print the table using kable
+# kable(significant_results, 
+#       caption = "DMedia Comparaciones sign. (p-value ≤ 0.05)", 
+#       col.names = c("Contraste", "Prueba", "Estimado", "SE", "df", "t Ratio", "p"), 
+#       digits = 3)  %>%
+#       footnote("Ajustado con Tukey") %>%
+#       kable_classic_2("hover", full_width = F)
+
+```
+
+
+## Validación del cálculo de entropía
+
+Para validar la métrica, se obtuvo el [coeficiente de correlación](AppendixB.qmd#term-id-102) (r) de los cálculos de entropía con otras métricas clásicas del laberinto de Morris. Los resultados expresan una correlación alta entre nuestra métrica de entropía y las otras métricas clásicas del \ac{mwm} (@tbl-entropiacor). 
+
+|                     | Entropia |
+| ------------------- | -------- |
+| Distancia Media     | 0.97     |
+| Tiempo en Zona      | 0.94     |
+| Tiempo en Cuadrante | 0.85     |
+: Coeficiente de Correlación de entropía con otras métricas del MWM.  {#tbl-entropiacor}
+
+Para validar nuestra métrica con el método de entropía original, reanalizamos 141 pruebas reportadas por @cooke2020. Comprobamos que las diferencias (*t de Student* pareada) entre las entropías calculadas con el método de Cooke y el método propuesto no son significativas ($t(140) = -1.6026$, $p = 0.111$, `media de las diferencias = -0.0542`). El resultado sugiere que la entropía calculada con el método propuesto es equivalente a la entropía calculada con el método de Cooke. Para evaluar el acuerdo y equivalencia entre las métricas, se realizó un gráfico y análisis de [Bland-Altman](AppendixB.qmd#term-id-101) (@fig-entropialatman). Los resultados de la prueba de Bland indican que la entropía calculada con el método propuesto y el método de @maei2009 son equivalentes y no presenta sesgo (`diferencia media = -0.0542, límites de acuerdo [IC al 95%] = -0.121 - 0.012`).
+
+
+
+:::: {layout="[[70, -5, 25], [45, -5, 50]]" fig-pos='H'}
+
+::: {#first-column}
+
+```{r entropiaValidar}
+#| label: fig-entropialineplotcomps
+#| fig-cap: "Comparación de las entropías calculadas con el método propuesto y el método de Cooke-Maei a lo largo de 140 pruebas en 3 experimentos."
+
+# library(dplyr)
+# library(purrr)
+# library(janitor)
+
+# df <- read.csv("./data/entropia_validar/prueba_37-3.csv") %>% janitor::clean_names()
+
+# head(df)
+
+# wm_entropy_val <- function(dir) {
+#   csv_files <- list.files(path = dir, full.names = TRUE, pattern = "prueba")
+
+#   entropy_data <- data.frame(set = character(), entropy = numeric())
+
+#   process_file <- function(file) {
+#     data <- read.csv(file)
+
+#     data <- data %>%
+#       janitor::clean_names() %>%
+#       slice(-1) %>%
+#       pivot_longer(everything(), cols_vary = "slowest", names_to = c(".value", "set"), names_pattern = "(.+)_(\\d+)") %>%
+#       drop_na() %>%
+#       rename(
+#   set = set,
+#   time = t,
+#   X = x,
+#   Y = y
+#       )
+
+#     # Assign reference points
+#     plat_x <- 35
+#     plat_y <- 70
+
+#     # Group by 'set' and calculate entropy for each group
+#     entropy_values <- data %>%
+#       group_by(set) %>%
+#       summarize(entropy = {
+#   # Convert x and y to vectors
+#   Xraw <- as.numeric(X)
+#   Yraw <- as.numeric(Y)
+
+#   # Calculate the difference between raw data and reference points
+#   d_x <- Xraw - plat_x
+#   d_y <- Yraw - plat_y
+
+#   # Calculate squared distance
+#   dist2 <- d_x^2 + d_y^2
+
+#   # Calculate the Euclidean distance
+#   dist <- sqrt(dist2)
+
+#   # Calculate the average distance
+#   dist_ave <- mean(dist)
+
+#   # Initialize weight w
+#   w <- 1
+
+#   # Calculate sum of weights
+#   sw <- sum(w)
+
+#   # Calculate weighted means for Dx and Dy
+#   xm <- mean(w * d_x) / sw
+#   ym <- mean(w * d_y) / sw
+
+#   # Calculate weighted means for squared Dx and Dy
+#   xxm <- mean(w * d_x * d_x) / sw
+#   yym <- mean(w * d_y * d_y) / sw
+
+#   # Calculate weighted mean for product of Dx and Dy
+#   xym <- mean(w * d_x * d_y) / sw
+
+#   # Calculate covariance matrix for Dx and Dy
+#   Sig <- matrix(c(xxm - xm^2, xym - xm * ym,
+#       xym - xm * ym, yym - ym^2), nrow=2)
+
+#   # Calculate eigenvalues of the covariance matrix
+#   eig_val <- eigen(Sig)$values
+
+#   # Calculate the product of eigenvalues
+#   var_xy2 <- eig_val[1] * eig_val[2]
+
+#   # Calculate the mean squared distance weighted by w
+#   mdist2 <- mean(w * dist2) / sw
+
+#   # Calculate the entropy based on mean squared distance and variance
+#   aa <- mdist2
+#   LogE <- 2 * 0.5 * log(aa) + 2 * 0.5 * 0.5 * log(var_xy2)
+
+#   # Return the mean of LogE as the entropy value
+#   mean(LogE)
+#       })
+
+#     # Append the entropy values to the entropy_data dataframe
+#     entropy_data <<- rbind(entropy_data, entropy_values)
+#   }
+
+#   # Apply the function to each CSV file
+#   walk(csv_files, process_file)
+
+#   return(entropy_data)
+# }
+
+# validado <- wm_entropy_val("./data/entropia_validar")
+# validadodos <- wm_entropy_val("./data/entropia_validar")
+# head(validadodos)
+# tail(validadodos)
+
+
+# entropia_cooke <- read.csv("./data/entropia_validar/entropia_cooke.csv") %>%
+#   janitor::clean_names() %>%
+#   select(animal, entropy) %>%
+#   filter(animal == "31-1")
+  # rename(entropy_cooke = entropy)
+
+
+# entropia_cooke <- read.csv("./data/entropia_validar/entropia_cooke.csv") %>%
+#   janitor::clean_names() %>%
+#   select(animal, entropy) %>%
+#   filter(animal == "31-2")
+
+# entropia_cooke <- read.csv("./data/entropia_validar/entropia_cooke.csv") %>%
+#   janitor::clean_names() %>%
+#   select(animal, entropy) %>%
+#   filter(animal == "37-3")
+
+
+# head(entropia_cooke)
+# head(validado)
+
+# cook <- sort(entropia_cooke$entropy)
+# mio <- sort(validado$entropy)
+
+# write.csv(entropia_cooke, file = "./data/entropia_validar/entropia_cook_373.csv")
+# write.csv(validadodos, file = "./data/entropia_validar/entropia_mio_373.csv")
+
+val_df <- read.csv("../data/entropia_validar/entropia_validar_juntos.csv")
+
+# head(val_df)
+
+ggplot(val_df, aes(x = id, y = entropia, colour = metodo)) +
+  geom_line(linetype = "solid", position = position_dodge(1.1), linewidth = 0.08) +
+  geom_point(aes(shape = metodo), size = 2, position = position_dodge(1.)) +
+  # geom_abline(intercept = 0, slope = 1, linetype = "dashed") +
+  labs(x = "ID de Prueba", y = "H") +
+  facet_grid(animal ~.) +
+  theme_prism(base_size = 12) +
+  theme(legend.position = "top") +
+  scale_color_prism("colorblind_safe") +
+  scale_fill_prism("colorblind_safe") +
+  scale_shape_prism(palette = "complete") +
+  scale_y_continuous(guide = "prism_offset_minor")
+
+```
+
+:::
+
+::: {#second-column}
+
+Los resultados de la prueba de T pareada indican que las diferencias entre las entropías calculadas con el método de Cooke-Maei y el método propuesto no son significativas ($t(140) = -1.6026$, $p = 0.111$, `media de las diferencias = -0.0542`).
+
+
+:::
+
+::: {#third-column}
+
+```{r entropialatman}
+#| label: fig-entropialatman
+#| fig-cap: "Gráfico de Bland-Altman para comparar la entropía calculada con el método propuesto y el método de Cooke y Maei"
+
+
+# bland.altman.plot(val_df$entropia[val_df$metodo == "Cooke"], val_df$entropia[val_df$metodo == "Santiago"], xlab = "media de los dos métodos", ylab = "Diferencia entre los métodos", main = "Gráfico de Bland-Altman para entropía", col = "blue", pch = 19)
+
+# bland.altman.plot(val_df$entropia[val_df$metodo == "Cooke"], val_df$entropia[val_df$metodo == "Santiago"], xlab = "media de H de los dos métodos", ylab = "Diferencia entre los métodos", col = "#2c1453", conf.int = .95, pch = 4)
+
+# bland.altman.plot(val_df$entropia[val_df$metodo == "Cooke"], val_df$entropia[val_df$metodo == "Santiago"], sunflower = TRUE)
+
+
+
+# bland.altman.stats(val_df$entropia[val_df$metodo == "Cooke"], val_df$entropia[val_df$metodo == "Santiago"]) # 141 med
+
+# Load necessary libraries
+# library(ggplot2)
+
+# Data preparation: calculate the mean and difference
+val_df$mean <- rowMeans(cbind(val_df$entropia[val_df$metodo == "Cooke"], 
+                              val_df$entropia[val_df$metodo == "Santiago"]))
+val_df$diff <- val_df$entropia[val_df$metodo == "Cooke"] - 
+               val_df$entropia[val_df$metodo == "Santiago"]
+
+# Calculate mean difference and limits of agreement (LoA)
+mean_diff <- mean(val_df$diff)
+sd_diff <- sd(val_df$diff)
+loa_upper <- mean_diff + 1.95 * sd_diff
+loa_lower <- mean_diff - 1.95 * sd_diff
+
+# Calculate 95% confidence intervals for the LoA
+n <- length(val_df$diff)
+se_diff <- sd_diff / sqrt(n)  # Standard error of the mean difference
+se_loa <- se_diff * sqrt(1 + (1.95^2 / (2 * n)))  # SE for the limits of agreement
+
+# 95% confidence intervals for the upper and lower limits
+ci_upper_upper <- loa_upper + 1.95 * se_loa
+ci_upper_lower <- loa_upper - 1.95 * se_loa
+ci_lower_upper <- loa_lower + 1.95 * se_loa
+ci_lower_lower <- loa_lower - 1.95 * se_loa
+
+# Create the Bland-Altman plot with confidence intervals
+ggplot(val_df, aes(x = mean, y = diff)) +
+  geom_point(shape = 4, color = "#2c1453", size = 3) +  # Plot points
+  geom_hline(yintercept = mean_diff, linetype = "solid", color = "red") +  # Mean difference line
+  geom_hline(yintercept = loa_upper, linetype = "dashed", color = "blue") +  # Upper LoA
+  geom_hline(yintercept = loa_lower, linetype = "dashed", color = "blue") +  # Lower LoA
+  
+  # Add shaded 95% confidence intervals around LoA
+  geom_ribbon(aes(ymin = ci_upper_lower, ymax = ci_upper_upper), 
+              fill = "#3389ff", alpha = 0.3) +  # Confidence interval for upper LoA
+  geom_ribbon(aes(ymin = ci_lower_lower, ymax = ci_lower_upper), 
+              fill = "#3389ff", alpha = 0.3) +  # Confidence interval for lower LoA
+
+  labs(x = "Media de H de los dos métodos", y = "Diferencia entre los métodos") +  # Labels
+  theme_prism(base_size = 14, palette = "candy_bright") +
+  scale_shape_prism(palette = "filled") 
+
+
+```
+
+:::
+
+::: {#forth-column}
+
+El eje X representa el promedio de las mediciones de entropía entre los dos métodos, mientras que el eje Y representa la diferencia entre las mediciones. La línea roja representa la diferencia media entre los métodos, en este caso, cercana a `0` (media de diferencias $= - 0.054$, I.C. = `-0.121 y 0.012`) indicando que las diferencias entre las métricas son equivalentes y sin sesgo. Las líneas azules representan los límites de acuerdo al `95%` (`-0.841 - 0.733`). Las áreas sombreadas representan los intervalos de confianza al `95%` de los límites de acuerdo.
+
+:::
+
+::::
+
+:::: {layout="[[100], [50, 50], [50, 50]]" fig-pos='H'}
+
+::: {#third-column}
+
+En la siguientes figuras, se ejemplifica el cálculo de entropía. Los puntos negros representan la distancia entre la posición del animal y la posición del *annulus*, mostrado en azul para el *annulus* original y rojo para el *annulus* reversa. Estas distancias se utilizan para calcular la matriz de covarianza que determina la forma y orientación de la elipse que describe mejor los datos. Los ejes mayores y menores de la elipse (derivados de los valores Eigen de la matriz de covarianza) corresponden a los ejes principales de la distribución de nuestros datos y se muestran como flechas rojas. Estos ejes principales  representan la varianza de los datos. 
+
+:::
+
+
+::: {#first-column}
+
+![$H$ en prueba 1](../Figures/fig-entropia-1.png){#fig-plotentropia}
+
+![$H$ en prueba 1](../Figures/fig-entropia-2.png){#fig-plotentropia2}
+
+:::
+
+::: {#second-column}
+
+![$H$ en prueba Reversa](../Figures/fig-entropia-3.png){#fig-plotentropia3}
+
+![$H$ en prueba Reversa](../Figures/fig-entropia-4.png){#fig-plotentropia4}
+
+:::
+
+::::
+
+Por último, se desarrolló una aplicación web interactiva para calcular la entropía a partir de las coordenadas de los animales en el \ac{mwm}. La aplicación se encuentra disponible en el siguiente enlace [https://santi-rios.github.io/maestria_app_water_maze/](https://santi-rios.github.io/maestria_app_water_maze/). La aplicación permite subir un archivo de coordenadas en formato CSV, calcular la entropía a partir de las coordenadas y mostrar un gráfico ejemplificando el cálculo. La aplicación fue desarrollada con [Shiny](https://shiny.rstudio.com/) y [R](https://www.r-project.org/). En la @fig-entropiaApp se muestra la interfaz de la aplicación.
+
+::: {#fig-entropiaApp layout="[[1], [1]]"}
+
+![Ejemplo del cálculo de entropía en una prueba al annulus original.](../Figures/entropia_app_1.jpg){#fig-entropiaapp1 width=60%}
+
+![Ejemplo del cálculo de entropía en una prueba al annulus reversa.](../Figures/entropia_app_2.jpg){#fig-entropiaapp2 width=65%}
+
+Interfaz de la aplicación Web desarrollada para el cálculo de entropía. [Disponible en este enlace](https://santi-rios.github.io/maestria_app_water_maze/).
+
+:::

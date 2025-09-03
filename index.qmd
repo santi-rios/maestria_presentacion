@@ -465,7 +465,7 @@ Quarto unifies & extends the R Markdown ecosystem.
 Si la fluoxetina puede aliviar los efectos emocionales negativos del estrés crónico, entonces podrá aliviar las modificaciones sobre la memoria remota espacial y la flexibilidad cognitiva.
 :::
 
-# Material y Métodos {.unnumbered .unlisted}
+# Material y Métodos 
 
 :::: {style="background-color: #ffffff; color: black; border-radius: 1px; padding: 1px;"}
 
@@ -501,9 +501,9 @@ Si la fluoxetina puede aliviar los efectos emocionales negativos del estrés cr�
 
 ::::
 
-# Resultados y Discusión
+# Resultados 
 
-## Entrenamientos: Días 1-4 (previo a estrés) {.smaller}
+## Entrenamientos: Días 1-4 (previo a estrés) {.smaller visibility="hidden"}
 
 :::: {.columns}
 
@@ -576,7 +576,7 @@ regresión de Poisson con efectos mixtos (utilizando máxima verosimilitud)
 :::
 
 
-## Entrenamientos Aprendizaje Reversa (post estrés)
+## Entrenamientos Aprendizaje Reversa (post estrés) {visibility="hidden"}
 
 :::: {.columns}
 
@@ -646,7 +646,7 @@ regresión de Poisson con efectos mixtos (utilizando máxima verosimilitud)
 
 :::
 
-## Comparación entre Pruebas {.center}
+## Comparación entre Pruebas {.center visibility="hidden"}
 
 :::: {.columns}
 
@@ -667,7 +667,7 @@ regresión de Poisson con efectos mixtos (utilizando máxima verosimilitud)
 :::
 
 ::: {.fragment fragment-index=4}
-![](./Chapters/5Resultados_files/figure-html/fig-distanciaMedia-1.png)
+![](./plots/probe_tests_comparison.gif)
 :::
 
 :::
@@ -699,7 +699,7 @@ probe_tables[["P-Rev"]]
 :::
 
 ::: {.fragment fragment-index=4}
-![](./plots/probe_tests_comparison.gif)
+![Métricas como Distancia media al blanco y [entropía de Shannon](https://www.brandmaier.de/roamingentropy/) son mejores métricas para evaluar el aprendizaje espacial [@maei2009; @maei2009a]](./Chapters/5Resultados_files/figure-html/fig-distanciaMedia-1.png)
 :::
 
 :::
@@ -729,54 +729,26 @@ placeholder
 :::
 
 
-## Evolución de la Memoria Espacial {.unnumbered .unlisted .smaller}
+## Desarrollo de aplicaciones para el analisis de datos {.smaller}
 
 ::: {layout="[45, -5, 45]"}
 
-![](./Chapters/5Resultados_files/figure-html/fig-distanciaMedia-1.png){#fig-distanciaMediainteraccion}
+![*Aplicación web para cálculo de entropía*, [link](https://hq2s4t-santiago-garc0a0r0os.shinyapps.io/water-maze-entropy/): Implementa el cálculo de entropía espacial [@maei2009] con visualización, simulación de datos y análisis estadísticos comparativos entre grupos. La implementación fue validada científicamente contra datos de referencia de @cooke2020](./Figures/app_entropia.png){#fig-appentropia}
 
-![](./Chapters/5Resultados_files/figure-html/fig-entropiatodos-1.png)
-
-:::
-
-Distancia media y entropía son mejores métricas para evaluar el aprendizaje espacial [@maei2009; @maei2009a]
-
-## Entropía {.unnumbered .unlisted .smaller}
-
-::: {.panel-tabset}
-
-### Figuras
-
-::: {layout="[45, -5, 45]"}
-
-![](./Figures/entropia.gif)
-
-![https://santi-rios.github.io/maestria_app_water_maze/](./Figures/entropia_app_1.jpg)
+![*Estrategias de búsqueda*, [link](http://hq2s4t-santiago-garc0a0r0os.shinyapps.io/WaterMaze-analysis-tool): Utiliza un clasificador de Random Forest con un  modelo que puede predecir estrategias con alta precisión (0.73) y recall (0.66), comparable a la consistencia entre expertos humanos [@overall2020]. Además permite generar mapas de densidad y análisis estadísticos de distintas métricas.](./Figures/app_estrategias.png){#fig-appestrategias}
 
 :::
 
-### Validación
 
-::: {layout="[45, -5, 45]"}
+# Discusión
 
-![](./Chapters/5Resultados_files/figure-html/fig-entropialineplotcomps-1.png)
-
-
-![](./Chapters/5Resultados_files/figure-html/fig-entropialatman-1.png)
-
-:::
-
-:::
-
-# Discusión {.unnumbered .unlisted}
-
-## Efecto principal del estrés {.unnumbered .unlisted}
+## Efecto principal del estrés {.unnumbered .unlisted visibility="hidden"}
 
 :::: {style="background-color: #ffffff; color: black; border-radius: 1px; padding: 1px;"}
 
 ::: {.fragment .fade-in-then-semi-out}
 
-El **estrés** afectó negativamente la flexibilidad cognitiva en el {{< acr MWM >}} (@fig-latenciasPostPresentacion, @fig-distanciaMediainteraccion)
+El estrés afectó negativamente la flexibilidad cognitiva en el {{< acr MWM >}} (?@fig-latenciasPostPresentacion, ?@fig-distanciaMediainteraccion)
 
 :::
 
@@ -800,33 +772,56 @@ El estrés crónico afecta negativamente la función cognitiva dependiente del h
 
 ::::
 
-## Mecanismo {.unnumbered .unlisted}
+## Efecto del estrés {.smaller}
+
+> El estrés crónico afecta negativamente la función cognitiva dependiente del hipocampo [@belleau2019], disminuyendo la Neurogénesis en esta zona y causando atrofia dendrítica [@dealcubierre2023; @kino2015].
+
+**Mecanismos involucrados**:
 
 ::: {style="background-color: #ffffff; color: black; border-radius: 10px; padding: 5px;"}
 
 ::: {.panel-tabset}
 
-### thp2
+### TPH-2
 
 ![@hornung2003; @waselus2011; @alenina2015; @levinson2023](./Figures/tph2_estres.png){width="50%"}
 
-### Receptores de serotonina
+### Receptores de 5-HT
 
 ![@hornung2003; @waselus2011; @alenina2015; @levinson2023](./Figures/neurogenesis.png){width="50%"}
-
-### Sistema
-
-![@hornung2003; @waselus2011; @alenina2015; @levinson2023](./Figures/raphe.png){width="50%"}
-
-### mecanismo
-
-![@hornung2003; @waselus2011; @alenina2015; @levinson2023](./Figures/ssri.png){width="50%"}
 
 ::: 
 
 :::
 
-## Efecto principal del tratamiento con fluoxetina {.unnumbered .unlisted}
+## Efecto del tratamiento con Fluoxetina {.smaller}
+
+> La [fluoxetina]{style="color: red;"} facilitó el reaprendizaje en el laberinto acuático
+
+**Posibles mecanismos**:
+
+::: {style="background-color: #ffffff; color: black; border-radius: 10px; padding: 5px;"}
+
+::: {.panel-tabset}
+
+### Inhibición
+
+![@kempermann2018](./Figures/neurogenesis_inhibicion.png){#fig-nhainhibicion width="50%"}
+
+### Separación de Patrones
+
+![@kempermann2018](./Figures/neurogenesis_separacion_patrones.png){#fig-nhaseparacion width="50%"}
+
+### Olvido
+
+![@toni2007; @toni2011: @toni2015](./Figures/neurogenesis_olvido.png){#fig-nhaolvido width="50%"}
+
+:::
+
+:::
+
+
+## Efecto principal del tratamiento con fluoxetina {.unnumbered .unlisted visibility="hidden"}
 
 :::: {style="background-color: #ffffff; color: black; border-radius: 1px; padding: 1px;"}
 
@@ -850,7 +845,7 @@ Mejora en la flexibilidad cognitiva (actualizar memorias y adaptarse a cambios) 
 
 ::::
 
-## Mecanismo {{<acr NHA>}}
+## Mecanismo {.unnumbered .unlisted visibility="hidden"}
 
 ::: {style="background-color: #ffffff; color: black; border-radius: 10px; padding: 5px;"}
 
@@ -872,31 +867,31 @@ Mejora en la flexibilidad cognitiva (actualizar memorias y adaptarse a cambios) 
 
 :::
 
-## Contribuciones para el análisisis de datos {.unnumbered .unlisted}
+## Contribuciones para el análisisis de datos
 
 :::: {style="background-color: #ffffff; color: black; border-radius: 1px; padding: 1px;"}
 
 ::: {.fragment .data-build}
 
-Utilizar métricas más sensibles a la función hipocampal y la flexibilidad cognitiva (distancia media, entropía, estrategias de búsqueda) [@garthe2013; @hernandez-mercado2022; @maei2009].
+Utilizar métricas más sensibles a la función hipocampal y la flexibilidad cognitiva (distancia media, **entropía**, estrategias de búsqueda) [@garthe2013; @hernandez-mercado2022; @maei2009].
 
 :::
 
 ::: {.fragment .data-build}
 
-Se utilizó una nueva regresión de Poisson (@fig-estrategiasPrepresentacion, @fig-estrategiasPostpresentacion) para modelar estrategias (*egocéntricas, alocéntricas y perseverantes*), ofreciendo un análisis más detallado que los enfoques tradicionales [@amelchenko2023].
+Se utilizó una nueva regresión de Poisson para modelar estrategias (*egocéntricas, alocéntricas y perseverantes*), ofreciendo un análisis más detallado que los enfoques tradicionales [@amelchenko2023].
 
 :::
 
 ::: {.fragment .data-build}
 
-  Este modelado confirmó la transición de estrategias egocéntricas a alocéntricas, dependientes del hipocampo
+Ambas aplicaciones se encuentran disponibles de manera gratuita en la web (@Fig-appentropia; @Fig-appestrategias)
 
 :::
 
 ::::
 
-## Limitaciones y Futuras Direcciones {.unnumbered .unlisted .smaller}
+## Limitaciones y Futuras Direcciones {.unnumbered .unlisted .smaller visibility="hidden"}
 
 :::: {style="background-color: #ffffff; color: black; border-radius: 1px; padding: 1px;"}
 
@@ -926,9 +921,9 @@ Se utilizó una nueva regresión de Poisson (@fig-estrategiasPrepresentacion, @f
 
 ::::
 
-# Conclusiones {.unnumbered .unlisted .smaller}
+# Conclusiones {.unnumbered .unlisted .smaller visibility="hidden"}
 
-## Fluoxetina y Flexibilidad Cognitiva {.unnumbered .unlisted .smaller}
+## Fluoxetina y Flexibilidad Cognitiva {.unnumbered .unlisted .smaller visibility="hidden"}
 
 ::: {style="background-color:rgb(180, 230, 244); color: black; border-radius: 10px; padding: 5px;"}
 
@@ -947,7 +942,7 @@ Los ratones tratados con fluoxetina, incluso bajo estrés, se adaptaron mejor a 
 
 :::
 
-## Impacto del Estrés Crónico {.unnumbered .unlisted .smaller}
+## Impacto del Estrés Crónico {.unnumbered .unlisted .smaller visibility="hidden"}
 
 ::: {style="background-color:rgb(255, 41, 41); color: black; border-radius: 10px; padding: 5px;"}
 
@@ -978,6 +973,24 @@ La *fluoxetina* favorece la *flexibilidad cognitiva* espacial dependiente del hi
 
 :::
 
+# Referencias Extras
+
+## Antidepresivos y el Ambiente
+
+> The double-edged sword of neural plasticity
+
+@branchi2011 y @branchi2022
+
+- Los niveles altos de plasticidad inducidos por medicamentos, como los antidepresivos serotoninérgicos y los psicodélicos, no son beneficiosos por sí mismos.
+- Una alta plasticidad hace que el cerebro y el comportamiento sean más susceptibles a cambios según factores contextuales, como las condiciones de vida.
+
+## Plasticidad Inducida y Demaduración de Neuronas por Antidepresivos
+
+- iPlasticity: Induced juvenile-like plasticity in the adult brain as a mechanism of antidepressants [@umemori2018]
+- Fluoxetine-induced dematuration of hippocampal neurons and adult cortical neurogenesis in the common marmoset [@ohira2019]
+- Reversal of hippocampal neuronal maturation by serotonergic antidepressants [@kobayashi2010]
+
+![](https://github.com/santi-rios/neurogenesis_seminario_plasticidad/blob/main/figs/higihara,2019.png?raw=true)
 
 # Fin
 

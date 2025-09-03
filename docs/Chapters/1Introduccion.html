@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.41">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>introduccion</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="1Introduccion_files/libs/clipboard/clipboard.min.js"></script>
+<script src="1Introduccion_files/libs/quarto-html/quarto.js"></script>
+<script src="1Introduccion_files/libs/quarto-html/popper.min.js"></script>
+<script src="1Introduccion_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="1Introduccion_files/libs/quarto-html/anchor.min.js"></script>
+<link href="1Introduccion_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="1Introduccion_files/libs/quarto-html/quarto-syntax-highlighting-48ffa3e5b9d089919c6712c39e5b00f2.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="1Introduccion_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="1Introduccion_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="1Introduccion_files/libs/bootstrap/bootstrap-1bc8a17f135ab3d594c857e9f48e611b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="sec-Intro" class="level1">
+<h1>Introducción</h1>
+<p>El hipocampo, término acuñado por Giulio Cesare Aranzi alrededor de 1564 debido a su semejanza con la forma de un caballo de mar (del griego <em>hippos</em> = ‘caballo’ y <em>kampos</em> = ‘monstruo marino’), es una estructura bilateral ubicada en el <strong>lóbulo temporal medial</strong> <span class="citation" data-cites="bir2015">[@bir2015]</span>. Esta estructura es fundamental en los procesos de <strong>memoria</strong> episódica, navegación espacial y regulación emocional <span class="citation" data-cites="squire1992 morris1982 sweatt2004">[@squire1992; @morris1982; @sweatt2004]</span>. El hipocampo se divide en tres áreas principales: 3, 2 y 1 <span class="citation" data-cites="franjic2022">[@franjic2022]</span>. Aunque algunos autores incluyen el área de 4 <span class="citation" data-cites="lorentedeno1934 wang2024">[@lorentedeno1934; @wang2024]</span>, otros investigadores <span class="citation" data-cites="blackstad1956 amaral2007 chauhan2021">[@blackstad1956; @amaral2007; @chauhan2021]</span> consideran que esta área es una región en la intersección entre el hipocampo y el , conocida como <em>hilus</em>. Esta organización en distintas áreas del hipocampo refleja no solo divisiones anatómicas, sino también diferencias funcionales y de conectividad <span class="citation" data-cites="cappaert2015">[@cappaert2015]</span>. A lo largo de la historia de las neurociencias, el hipocampo ha sido objeto de estudios extensos en diversas disciplinas, permitiendo comprender múltiples procesos. Por ejemplo, en psicología ha permitido entender procesos de memoria <span class="citation" data-cites="scoville1957 penfield1958">[@scoville1957; @penfield1958]</span> y emociones <span class="citation" data-cites="kluver1937 kluver1939">[@kluver1937; @kluver1939]</span>; en fisiología, ha sido clave para entender la plasticidad sináptica <span class="citation" data-cites="bliss1973">[@bliss1973]</span>; en neurociencia computacional, ha permitido el desarrollo modelos computacionales <span class="citation" data-cites="marr1971">[@marr1971]</span> y en neurología ha sido fundamental para entender patologías como la epilepsia, Alzheimer <span class="citation" data-cites="andersen2007">[@andersen2007]</span>, y el estrés crónico <span class="citation" data-cites="sandi2013">[@sandi2013]</span>.</p>
+<section id="formación-hipocampal" class="level2">
+<h2 class="anchored" data-anchor-id="formación-hipocampal">Formación hipocampal</h2>
+<p>El impacto de la formación hipocampal en la cognición y la salud mental ha sido ampliamente estudiado durante las últimas décadas. Con base en características de citoarquitectura, tipos celulares y circuitos, esta formación se compone de distintas subregiones (<a href="#fig-formacionhipocampal" class="quarto-xref">Figure&nbsp;1</a>): Una capa granular conformada por el , una capa de <a href="AppendixB.qmd#term-id-48">células piramidales</a> (“”), a su vez subdividida en <em>cornu Ammonis</em> 1 (CA1), <em>cornu Ammonis</em> 2 (CA2), <em>cornu Ammonis</em> 3 (CA3) y el subículo <span class="citation" data-cites="andersen2007 schultz2014">[@andersen2007;@schultz2014]</span>. Adicionalmente, la también forma parte de este complejo hipocampal, aunque su estructura es de seis capas, similar a la neocorteza <span class="citation" data-cites="franjic2022">[@franjic2022]</span>.</p>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout="[40, -5, 55]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 40.0%;justify-content: flex-start;">
+<div id="fig-formacionhipocampal" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-scap="Formación hipocampal">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-formacionhipocampal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/formacion_hipocampal.png" class="img-fluid figure-img" data-fig-scap="Formación hipocampal">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-formacionhipocampal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Ilustración de Formación hipocampal
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 5.0%;justify-content: flex-start;">
+<p>&nbsp;</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 55.0%;justify-content: flex-start;">
+<p>Se muestran las principales estructuras en un corte coronal: , y el subículo. Las flechas negras representan el flujo de información. El hipocampo se encuentra debajo del ventrículo lateral (este último no forma parte de la formación) y su forma recuerda al género <em>Hippocampus</em> (Caballo de mar) <span class="citation" data-cites="bir2015">[@bir2015]</span>. Figura adaptada de <span class="citation" data-cites="andersen2007">@andersen2007</span>.</p>
+</div>
+</div>
+</div>
+<p> La formación hipocampal es crucial para la adquisición y consolidación de las <a href="AppendixB.qmd#term-id-2">memorias episódicas</a> <span class="citation" data-cites="squire1992">[@squire1992]</span>, es decir, memorias de eventos, contextos, mapas espaciales y su temporalidad <span class="citation" data-cites="tulving1972">[@tulving1972]</span>. del hipocampo en la memoria, es relevante considerar los primeros estudios sobre los mecanismos de almacenamiento y olvido de la memoria.</p>
+<p>En 1885, Hermann Ebbinghaus inició las investigaciones cuantitativas sobre la memoria y los principios que influenciaban en su almacenamiento y olvido, como la frecuencia y la <a href="AppendixB.qmd#term-id-58">valencia</a> del estímulo (revisado en <span class="citation" data-cites="seel2012">@seel2012</span>). <span class="citation" data-cites="semon1921">@semon1921</span> propuso que las trazas de memoria eran cambios físicos en las células nerviosas (un término que denominó <a href="AppendixB.qmd#term-id-1">engrama</a>), una idea fundamental para el entendimiento de cómo las experiencias se codifican en el cerebro. <span class="citation" data-cites="papez1937">@papez1937</span>, influenciado por el trabajo de <span class="citation" data-cites="cannon1927">@cannon1927</span> y <span class="citation" data-cites="bard1929">@bard1929</span>, describió el “<em>circuito de Papez</em>”, un intento para identificar un sustrato anatómico de las emociones. Entre las estructuras que conformaban este circuito se encontraba el hipotalamo, corteza cingulada y el hipocampo. Casi al mismo tiempo, <span class="citation" data-cites="kluver1939">@kluver1939</span>, a partir de experimentos en primates con mescalina y la extracción del <a href="AppendixB.qmd#term-id-59">lóbulo temporal</a>, observaron efectos en el comportamiento y el procesamiento de emociones. Klüver señaló que estas lesiones no abolían las emociones, sino que alteraban la forma en que las emociones podían utilizarse para guiar de manera correcta los comportamientos, una conclusión que según el mismo Papez, confirmaban su teoría <span class="citation" data-cites="nahm1997">[@nahm1997]</span>.</p>
+<p>Sin embargo, la relación del hipocampo con la memoria se evidenció de manera más clara con el estudio del paciente H.M. por <span class="citation" data-cites="scoville1957">@scoville1957</span>. Este paciente desarrolló amnesia anterógrada (incapacidad de formar nuevas memorias declarativas) tras una cirugía en la que se le extirpó bilateralmente el <a href="AppendixB.qmd#term-id-59">lóbulo temporal medial</a> como tratamiento para su epilepsia. Por otro lado, su <a href="AppendixB.qmd#term-id-4">memoria de corto plazo</a>, <a href="AppendixB.qmd#term-id-60">memoria procedural</a>, así como su habilidad de recordar <a href="AppendixB.qmd#term-id-6">memorias declarativas</a> que existían tiempo antes de su cirugía, . Este caso abrió las puertas a nuevas teorías sobre la memoria <span class="citation" data-cites="sweatt2004">[@sweatt2004]</span> y resaltó la importancia del hipocampo en la <a href="AppendixB.qmd#term-id-9">adquisición</a> de <a href="AppendixB.qmd#term-id-5">memorias de largo plazo</a>, pero no necesariamente su almacenamiento permanente (ver <a href="#sec-consolidacion" class="quarto-xref">Section&nbsp;1.1.3</a>). Utilizando un análisis histológico y de imagenología más preciso del paciente H.M se observó que también tenía severamente dañada la <a href="AppendixB.qmd#term-id-13">amígdala</a> y la , además que algunas partes del hipocampo permanecían, lo que prueba la importancia de la formación completa para llevar a cabo sus roles cognitivos <span class="citation" data-cites="annese2014">[@annese2014]</span>.</p>
+<p>Un aspecto fundamental de la formación hipocampal es su gran <a href="AppendixB.qmd#term-id-15">plasticidad sináptica</a> a nivel electrofisiológico y estructural <span class="citation" data-cites="mateos-aparicio2019">[@mateos-aparicio2019]</span>, que le permite reorganizarse mediante procesos como la <span class="citation" data-cites="bliss1973">[@bliss1973]</span> y la <span class="citation" data-cites="ito1982">[@ito1982]</span>. Estos procesos (<a href="#sec-sph" class="quarto-xref">Section&nbsp;1.1.2</a>) permiten al hipocampo responder a patrones específicos de activación con aumentos o disminuciones duraderas en la eficacia sináptica <span class="citation" data-cites="kandel1965">[@kandel1965]</span>. Además, la neurogénesis (<a href="#sec-nha" class="quarto-xref">Section&nbsp;1.1.5</a>), o generación de nuevas neuronas, ocurre en el incluso en la adultez de la mayoría de los mamíferos <span class="citation" data-cites="gage2019">[@gage2019]</span>. Esta plasticidad permite al hipocampo adaptarse a nuevas experiencias y aprendizajes <span class="citation" data-cites="epp2016">[@epp2016]</span>, así como también ajustar la conducta en respuesta al estrés crónico <span class="citation" data-cites="santarelli2003">[@santarelli2003]</span>. Los cambios sinápticos duraderos que caracterizan estos procesos permiten que las redes neuronales del hipocampo almacenen y utilicen información de manera eficiente y flexible <span class="citation" data-cites="kandel2014">[@kandel2014]</span>. Este ambiente altamente plástico es también esencial para la navegación espacial y la formación de mapas cognitivos (<a href="#sec-mapa" class="quarto-xref">Section&nbsp;1.1.4</a>), funciones en las que el hipocampo ha demostrado ser crítico <span class="citation" data-cites="morris1982">[@morris1982]</span>. Además, el estrés crónico, que puede alterar estos procesos de plasticidad, se ha relacionado con déficits cognitivos que afectan la <a href="AppendixB.qmd#term-id-9">adquisición</a>, <a href="AppendixB.qmd#term-id-10">consolidación</a> y <a href="AppendixB.qmd#term-id-12">evocación</a> de las memorias <span class="citation" data-cites="sandi2013">[@sandi2013]</span>, destacando la importancia de estos procesos en la salud mental.</p>
+<section id="anatomía-y-conectividad" class="level3">
+<h3 class="anchored" data-anchor-id="anatomía-y-conectividad">Anatomía y conectividad</h3>
+<p>La formación hipocampal (<a href="#fig-formacionhipocampal" class="quarto-xref">Figure&nbsp;1</a>) tiene una conectividad principalmente unidireccional (<a href="#fig-formacionhipocampaldos" class="quarto-xref">Figure&nbsp;2 (a)</a>) de naturaleza glutamatérgica que forma un circuito cerrado (<a href="#fig-formacionhipocampaltres" class="quarto-xref">Figure&nbsp;2 (b)</a>), con el siendo fundamental por recibir y procesar gran parte de la información <span class="citation" data-cites="cappaert2015">[@cappaert2015]</span>. Las entradas extrínsecas que modulan el circuito hipocampal provienen de varias áreas corticales, del <a href="AppendixB.qmd#term-id-13">complejo amigdalino,</a> del <a href="AppendixB.qmd#term-id-64">área septal medial</a> y del <a href="AppendixB.qmd#term-id-26">tálamo</a> <span class="citation" data-cites="chauhan2021">[@chauhan2021]</span>. Sus principales incluyen el <a href="AppendixB.qmd#term-id-65">giro cingulado</a>, el hipocampo contralateral y la <span class="citation" data-cites="schultz2014">[@schultz2014]</span>. </p>
+<p>La <em>principal</em> vía unidireccional del hipocampo se conoce como el <strong>circuito trisináptico</strong> por el número de contactos excitatorios que lo componen (<a href="#fig-formacionhipocampaldos" class="quarto-xref">Figure&nbsp;2 (a)</a>). El primer relevo del circuito trisináptico ocurre en la capa molecular del , donde las dendritas de sus <a href="AppendixB.qmd#term-id-49">células granulares</a> que comprende una vía unidireccional reciben proyecciones axónicas desde la . Estos axones entorrinales constituyen la <a href="AppendixB.qmd#term-id-61">vía perforante</a>, denominada así porque atraviesan físicamente el <a href="AppendixB.qmd#term-id-67">subículo</a>. Los axones de las células granulares del giro dentado a su vez proyectan a 3 formando las <em>fibras musgosas</em>, llamadas así por sus numerosos botones sinápticos que protruyen de sus axones, formando sinapsis de tipo <em>en passant</em> con sus neuronas blanco. Las neuronas de 3 finalmente transmiten su salida a través de las <a href="AppendixB.qmd#term-id-63">colaterales de Schaffer</a> a las <a href="AppendixB.qmd#term-id-48">neuronas piramidales</a> de 1 <span class="citation" data-cites="andersen2007">[@andersen2007]</span> y también entre ellas mismas <span class="citation" data-cites="kesner2007">[@kesner2007]</span>. Además de sus complejas aferencias y conexiones intrínsecas, la organización del hipocampo se estructura en subregiones funcionales específicas, como describiremos más adelante.</p>
+<p><strong>Entradas al hipocampo</strong>. Además de la <strong>vía perforante</strong>, algunos axones procedentes de la de la proyectan directamente a la región 1, formando la <em>vía directa</em> (<a href="#fig-formacionhipocampaltres" class="quarto-xref">Figure&nbsp;2 (b)</a>). 2 recibe algunas proyecciones de la de la , aunque estas son menos prominentes que las dirigidas a otras regiones del hipocampo <span class="citation" data-cites="cappaert2015">[@cappaert2015]</span>. 3, por su parte, recibe proyecciones de las fibras musgosas del y de las neuronas piramidales de la capa II de la <span class="citation" data-cites="andersen2007">[@andersen2007]</span>. 3, por su parte, recibe proyecciones de las fibras musgosas, que son los axones de las células granulares del y de las neuronas piramidales de la capa II de la mediante la <em>vía perforante</em> <span class="citation" data-cites="chauhan2021">[@chauhan2021]</span>.</p>
+<p><strong>Salidas del hipocampo</strong>. Las células piramidales de 3 proyectan a 1 mediante las <strong>colaterales de Schaffer</strong> (<a href="#fig-formacionhipocampaldos" class="quarto-xref">Figure&nbsp;2 (a)</a>). También se observan proyecciones desde 3 hacia 2, aunque las interacciones entre estas regiones están menos estudiadas <span class="citation" data-cites="andersen2007">[@andersen2007]</span>. Las <strong>colaterales de Schaffer</strong> también realizan conexiones recurrentes dentro de 3, creando un circuito complejo de interconexiones <span class="citation" data-cites="schultz2014">[@schultz2014]</span>, mientras que las proyecciones hacia otras zonas (p.ej. subículo) se originan principalmente desde 1 <span class="citation" data-cites="chauhan2021">[@chauhan2021]</span>. 1 genera proyecciones hacia la (principalmente hacia la ) y hacia el subículo, desempeñando un papel crucial en la transmisión de información dentro de estos circuitos; estas conexiones forman parte del circuito trisináptico (<a href="#fig-formacionhipocampaldos" class="quarto-xref">Figure&nbsp;2 (a)</a>).</p>
+<div id="fig-formacion" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-formacion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-formacion" style="flex-basis: 45.0%;justify-content: flex-start;">
+<div id="fig-formacionhipocampaldos" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-formacionhipocampaldos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/hipocampo_neuronas.png" class="img-fluid figure-img" data-ref-parent="fig-formacion">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-formacionhipocampaldos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Anatomía de la red hipocampal. El diagrama ilustra la vía trisináptica en el hipocampo, la cual consiste en proyecciones secuenciales desde la al , luego de 3 a 1 y finalmente al subículo <span class="citation" data-cites="yau2015">[@yau2015]</span>. Figura adaptada de <span class="citation" data-cites="andersen2007">@andersen2007</span>.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 5.0%;justify-content: flex-start;">
+<p>&nbsp;</p>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-formacion" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-formacionhipocampaltres" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-formacionhipocampaltres-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/aferencias_eferencias_hipocampo.png" class="img-fluid figure-img" data-ref-parent="fig-formacion">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-formacionhipocampaltres-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Esquematización de la conectividad hipocampal. Los estímulos sensoriales externos parten de distintas capas en la y alcanzan la región 1 mediante dos rutas (directa o por medio del ). La es la principal fuente de entrada cortical al hipocampo y el principal receptor de sus salidas. Además, 3 tiene conexiones recurrentes <span class="citation" data-cites="chen2024">[@chen2024]</span> que permiten la formación de redes autoasociativas que facilitan la recuperación de recuerdos <span class="citation" data-cites="kesner2007">[@kesner2007]</span>. Figura adaptada de <span class="citation" data-cites="andersen2007">@andersen2007</span>.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-formacion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Anatomía y conectividad de la Formación Hipocampal.
+</figcaption>
+</figure>
+</div>
+<p>El es una región trilaminada compuesta por la capa molecular, donde se encuentran las proyecciones dendríticas de las células granulares, la capa granular conformada por los somas de éstas, y la capa polimórfica <span class="citation" data-cites="andersen2007">[@andersen2007]</span>. Esta última región es notable por presentar neurogénesis continua (<a href="#fig-neurogenesishipo" class="quarto-xref">Figure&nbsp;4</a>) a lo largo de la vida de la mayoría de mamíferos <span class="citation" data-cites="gage2019">[@gage2019]</span>, incluyendo al humano <span class="citation" data-cites="eriksson1998 spalding2013">[@eriksson1998; @spalding2013]</span>. Las células granulares son el principal tipo de célula en el , formando capas densamente empaquetadas y dando origen a axones que inervan 3; sin embargo, el también cuenta con una población importante de interneuronas gabaérgicas (ver <a href="#fig-inhibicion" class="quarto-xref">Figure&nbsp;7</a>). Por último, el recibe aferencias importantes de la a través de la vía perforante y proyecta a 3 <span class="citation" data-cites="chauhan2021">[@chauhan2021]</span>.</p>
+<p>El subículo también está compuesto principalmente de neuronas piramidales y forma una zona de transición entre 1 <span class="citation" data-cites="cappaert2015">[@cappaert2015]</span>. Esta estructura, y en menor medida 1, son las principales fuentes que proyectan fuera de la formación hipocampal hacia áreas como la (la cual se reconecta mediante el <a href="AppendixB.qmd#term-id-66">giro parahipocampal</a> con sitios <a href="AppendixB.qmd#term-id-68">neocorticales</a>), la <a href="AppendixB.qmd#term-id-13">amígdala</a>, la y la , y el <a href="AppendixB.qmd#term-id-27">núcleo accumbens</a> <span class="citation" data-cites="small2011">[@small2011]</span>. Además, la actúa como punto de entrada para la información sensorial y como conducto para la información procesada que se releva nuevamente a la <a href="AppendixB.qmd#term-id-68">neocorteza</a> <span class="citation" data-cites="schultz2014">[@schultz2014]</span>.</p>
+<p>La diversidad de tipos celulares dentro de la formación hipocampal genera diferencias moleculares que confieren distinta labilidad ante varios tipos de agravio. Por ejemplo, en la enfermedad de Alzheimer, los depósitos de ovillos neurofibrilares que generan neurodegeneración afectan en un principio a 1 antes que otras regiones del hipocampo <span class="citation" data-cites="small2011">[@small2011]</span>. En los insultos agudos que involucran daño excitotóxico, como isquemia y epilepsia, las neuronas piramidales de 1 son más vulnerables, mientras que y 3 son más resistentes <span class="citation" data-cites="davidson2024">[@davidson2024]</span>. Por otro lado, el es susceptible al estrés crónico y desórdenes de ansiedad y depresión debido a la presencia de receptores a glucocorticoides <span class="citation" data-cites="bartsch2012">[@bartsch2012]</span>. Esta vulnerabilidad diferencial subraya la importancia de entender las funciones específicas de cada componente en la dinámica global del hipocampo.</p>
+<p>La función de cada estructura se puede simplificar utilizando la analogía de <span class="citation" data-cites="sugar2019">@sugar2019</span> que destaca cómo el hipocampo procesa y edita la información, además de jugar un papel crucial en la consolidación y recuperación de recuerdos: las entradas desde la <em></em> pueden funcionar como una película de experiencias continuas transmitidas al hipocampo (<em></em>), que actúa como el editor de este flujo constante de información. A través de la plasticidad neuronal modulada por el tiempo de disparo y la reproducción, el <em>hipocampo</em> extrae y etiqueta eventos memorables para consolidarlos en la <a href="AppendixB.qmd#term-id-2">memoria episódica</a>. Durante la recuperación, incluso con una entrada parcial o degradada de la traza de memoria codificada, 3 realiza eficientemente el completamiento de patrones e instruye a los índices de memoria en 1, los cuales canalizan la reactivación cortical para el recuerdo.</p>
+</section>
+<section id="sec-sph" class="level3">
+<h3 class="anchored" data-anchor-id="sec-sph">Aprendizaje y plasticidad</h3>
+<p>Los mecanismos y la hipótesis más aceptada <span class="citation" data-cites="abraham2019">[@abraham2019]</span> que explican las bases del aprendizaje en el hipocampo se engloban en el concepto de <a href="AppendixB.qmd#term-id-15">plasticidad neuronal</a>, que se puede definir como la capacidad de las neuronas para cambiar su actividad en respuesta a estímulos mediante la reorganización, cambio de función o conectividad <span class="citation" data-cites="kolb2014">[@kolb2014]</span>. La idea de que la fuerza de las conexiones sinápticas subyace al fenómeno de la memoria proviene de <span class="citation" data-cites="cajal1894">@cajal1894</span>, aunque fue <span class="citation" data-cites="hebb1949">@hebb1949</span> quien postuló cómo se produce este fortalecimiento. En su famoso postulado “<em>las neuronas que se activan juntas, se conectan juntas</em>”, Hebb propuso que, si una neurona A participa repetidamente en la activación de una neurona B, la conexión sináptica entre A y B se fortalecerá. Este postulado de Hebb fue fundamental para entender cómo una experiencia puede generar aprendizaje a través de la plasticidad sináptica <span class="citation" data-cites="kandel2014">[@kandel2014]</span>. Como demostrarían <span class="citation" data-cites="bliss1973">@bliss1973</span> mediante el estudio de la <a href="AppendixB.qmd#term-id-61">vía perforante</a> de conejos, una estimulación de alta frecuencia produce un incremento duradero en la eficacia de las sinapsis, demostrando que las neuronas <em>potencían</em> sus conexiones en respuesta a un estímulo . Este fenómeno es conocido como . Unos años después, <span class="citation" data-cites="ito1982">@ito1982</span> describieron otro mecanismo por el cuál se debilitaba las conexiones sinápticas, conocido como . Aunque la fue inicialmente reportada en el cerebelo de conejos, este mecanismo, junto con la , son fundamentales para el aprendizaje y la dinámica del hipocampo, como la consolidación y mantenimiento de la memoria <span class="citation" data-cites="dhooge2001 fox2017">[@dhooge2001; @fox2017]</span>. Los mecanismos canónicos de y se presentan en la <a href="#fig-sph" class="quarto-xref">Figure&nbsp;3</a>.</p>
+<div id="fig-sph" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-sph" style="flex-basis: 47.4%;justify-content: flex-start;">
+<div id="fig-LTP" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-LTP-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/LTP.png" class="img-fluid figure-img" data-ref-parent="fig-sph">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-LTP-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) LTP. Este fenómeno se induce experimentalmente mediante la estimulación sináptica de alta frecuencia que desencadena una serie de eventos moleculares en la neurona postsináptica <span class="citation" data-cites="bliss1973 lynch2004 bliss2011 luscher2012 nicoll2017">[@bliss1973; @lynch2004; @bliss2011; @luscher2012; @nicoll2017]</span>. Primero la estimulación de alta frecuencia induce la liberación de glutamato desde la terminal presináptica. El glutamato se une y activa los receptores en la membrana postsináptica. La activación de los receptores NMDA permite la entrada de iones de calcio (<span class="math inline">\(Ca^{2+}\)</span>) al interior de la célula postsináptica, donde el <span class="math inline">\(Ca^{2+}\)</span> actúa como un segundo mensajero. Este aumento de <span class="math inline">\(Ca^{2+}\)</span> intracelular activa varias proteínas cinasas, como la y que fosforilan proteínas y receptores en la membrana postsináptica y resulta en la inserción de receptores . La mayor densidad de receptores AMPA en la membrana fortalece la respuesta sináptica a futuras liberaciones de glutamato (sinapsis potenciada). Figura basada en <span class="citation" data-cites="luscher2012">@luscher2012</span>
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 5.3%;justify-content: flex-start;">
+<p>&nbsp;</p>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-sph" style="flex-basis: 47.4%;justify-content: flex-start;">
+<div id="fig-LTD" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-LTD-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/LTD.png" class="img-fluid figure-img" data-ref-parent="fig-sph">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-LTD-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) LTD. Es un proceso en el cual se debilitan las conexiones sinápticas, reduciendo su eficacia <span class="citation" data-cites="ito1982 bliss2011 luscher2012">[@ito1982; @bliss2011; @luscher2012]</span>. La LTD se induce experimentalmente mediante la estimulación sináptica de baja frecuencia. Al igual que en la LTP, la estimulación sináptica provoca la liberación de glutamato y la activación de los receptores NMDA en la neurona postsináptica. Sin embargo, la estimulación de baja frecuencia resulta en una entrada moderada de <span class="math inline">\(Ca^{2+}\)</span> en la célula postsináptica, lo que conduce a la activación de fosfatasas en lugar de cinasas. En particular, fosfatasas como la calcineurina y son activadas por esta entrada de <span class="math inline">\(Ca^{2+}\)</span>. Estas fosfatasas desfosforilan proteínas y receptores, lo que provoca la internalización y degradación de los receptores AMPA en la membrana postsináptica. La pérdida de receptores AMPA reduce la sensibilidad de la sinapsis al glutamato, debilitando así la conexión sináptica. Figura basada en <span class="citation" data-cites="luscher2012">@luscher2012</span>
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sph-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Mecanismos Canónicos de LTP y LTD.
+</figcaption>
+</figure>
+</div>
+<p>El descubrimiento de estas manifestaciones de plasticidad neuronal dejaba en claro que el cerebro y sus conexiones no son fijas, sino que son “maleables” y se puede reorganizar a lo largo de la vida gracias a las experiencias <span class="citation" data-cites="kandel2014">[@kandel2014]</span>. Esta noción permitió avanzar en la comprensión de cómo distintas experiencias pueden influir en múltiples niveles —i.e.&nbsp;electrofisiológico (, ), morfológico, en proteínas, genes y en la conducta— dentro del sistema nervioso <span class="citation" data-cites="bailey2008">[@bailey2008]</span>. Sin embargo, la primera evidencia que la plasticidad neuronal producía cambios en la conducta fue reportada por <span class="citation" data-cites="kandel1965">@kandel1965</span> en el molusco marino <em>Aplysia californica</em>. En este estudio, Kandel y Tauc analizaron el reflejo de retirada del sifón, un comportamiento de defensa donde el animal retrae esta estructura cuando se toca. Encontraron que la plasticidad sináptica (cambios en la fuerza de las conexiones) se relacionaba con dos tipos de aprendizaje y la conducta asociada: <a href="AppendixB.qmd#term-id-55">habituación</a> (reducción de la respuesta de retirada asociada con una disminución en la eficacia sináptica) y <a href="AppendixB.qmd#term-id-56">sensibilización</a> (aumento de la respuesta debido a un incremento en la eficacia sináptica).</p>
+<p>Por otro lado, el primer trabajo experimental que demostró el papel de la plasticidad en el aprendizaje mediado por el hipocampo fue realizado por <span class="citation" data-cites="morris1986">@morris1986</span>. Utilizando el antagonista de <em></em> en el , disminuyeron en el hipocampo de ratas para impedir el aprendizaje espacial (dependiente del hipocampo). Con una técnica más avanzada, <span class="citation" data-cites="silva1992">@silva1992</span> utilizaron ratones con mutaciones en la proteína sináptica <span class="math inline">\(\alpha\)</span>- para reducir la en el hipocampo y confirmaron las deficiencias en el aprendizaje espacial. El desarrollo de la técnica de <a href="AppendixB.qmd#term-id-69">Cre-Lox recombinasa</a> <span class="citation" data-cites="sauer1988 orban1992">[@sauer1988; @orban1992]</span> permitió estudios más refinados al manipular tipos específicos de células y proteínas en momentos concretos para estudiar la relación con la conducta <span class="citation" data-cites="tsien1996a">[@tsien1996a]</span>. Usando esta técnica, <span class="citation" data-cites="mchugh2007">@mchugh2007</span> crearon ratones que carecían del receptor específicamente en las células granulares del . Esta investigación encontró que estos animales tenían deficiencias en la prueba de discriminación contextual al miedo, otra prueba que se puede utilizar para evaluar la función hipocampal <span class="citation" data-cites="hernandez-mercado2022">[@hernandez-mercado2022]</span>.</p>
+<p>Estas investigaciones demuestran que la plasticidad dependiente de en el es importante para el aprendizaje y la conducta. Sin embargo, la no es un mecanismo único conservado en todos los tipos neuronales <span class="citation" data-cites="alkadhi2021">[@alkadhi2021]</span>, variando incluso en las divisiones del hipocampo <span class="citation" data-cites="mcnaughton1982 luscher2012">[@mcnaughton1982; @luscher2012]</span>. Por ejemplo, el fortalecimiento de las conexiones se puede inducir sin la de calcio postsináptico como se ha observado en la de las fibras musgosas <span class="citation" data-cites="mellor2001">[@mellor2001]</span>. Adicionalmente, la y no son fenómenos exclusivos de las redes hipocampales <span class="citation" data-cites="innocenti2022">[@innocenti2022]</span> y su temporalidad, regulación y función van más allá de los mecanismos canónicos <span class="citation" data-cites="fox2017 mateos-aparicio2019 han2023">[@fox2017; @mateos-aparicio2019; @han2023]</span> presentados en la <a href="#fig-sph" class="quarto-xref">Figure&nbsp;3</a>. En los últimos años se ha generado interés por el papel de estos mecanismos plásticos en la comunicación entre el hipocampo y otras estructuras para entender cómo se genera una memoria episódica (<a href="#sec-consolidacion" class="quarto-xref">Section&nbsp;1.1.3</a>). Estas investigaciones han resaltado el papel del hipocampo para mediar la memoria en conjunto con la <a href="AppendixB.qmd#term-id-69">neocorteza</a> <span class="citation" data-cites="kitamura2017 tonegawa2018 goto2021">[@kitamura2017; @tonegawa2018; @goto2021]</span>. Sin embargo, <a href="#callout-reconsolidacion">hay otros mecanismos que regulan la memoria y el comportamiento</a> más allá de la LTP/LTD.</p>
+</section>
+<section id="sec-consolidacion" class="level3">
+<h3 class="anchored" data-anchor-id="sec-consolidacion">Consolidación de sistemas</h3>
+<p>Décadas de investigación han demostrado que la formación hipocampal está implicada en diversas funciones cognitivas, incluyendo el aprendizaje contextual <span class="citation" data-cites="amelchenko2023">[@amelchenko2023]</span>, la navegación espacial <span class="citation" data-cites="morris1982">[@morris1982]</span>, el discernimiento de contextos similares o <em>separación de patrones</em> <span class="citation" data-cites="nakashiba2012">[@nakashiba2012]</span> y los procesos de memoria que surgen como resultado de la integración, separación y completamiento de la información proyectada y transmitida a través de sus distintas subregiones <span class="citation" data-cites="mcavoy2015">[@mcavoy2015]</span>. Estas funciones del hipocampo están estrechamente vinculadas con su papel en la memoria episódica, como se ha sugerido en investigaciones históricas y contemporáneas.</p>
+<p>Como se mencionó anteriormente, la investigación de <span class="citation" data-cites="scoville1957">@scoville1957</span> indicaba que el lóbulo temporal medial, que alberga la formación hipocampal, es crucial para la <a href="AppendixB.qmd#term-id-10">consolidación</a> (estabilización de la información adquirida) y la <a href="AppendixB.qmd#term-id-12">recuperación</a> de memorias <a href="AppendixB.qmd#term-id-6">declarativas</a> <span class="citation" data-cites="berdugo-vega2023">[@berdugo-vega2023]</span>. Aunque <span class="citation" data-cites="scoville1957">@scoville1957</span> originalmente concluyeron que el estudio demostraba la importancia del hipocampo anterior y el giro hipocampal en la formación y retención de nuevas experiencias, más tarde se demostró que la operación de H.M. no se limitó solo al hipocampo. <span class="citation" data-cites="corkin1997">@corkin1997</span> revelaron que la cirugía se extendía al complejo <a href="AppendixB.qmd#term-id-13">amigdalino</a>, la , partes de la corteza <a href="AppendixB.qmd#term-id-66">perirrinal</a> y porciones rostrales del hipocampo, así como partes de la corteza <a href="AppendixB.qmd#term-id-66">parahipocampal</a>. Sin embargo, <span class="citation" data-cites="zola-morgan1986">@zola-morgan1986</span> presentaron el caso del paciente R.B., quien desarrolló amnesia anterógrada severa después de un episodio isquémico que resultó en una lesión bilateral limitada a la región 1 del hipocampo. Estos hallazgos subrayan la importancia del hipocampo en la memoria, lo que lleva a una comprensión más profunda del proceso de <a href="AppendixB.qmd#term-id-10">consolidación</a> de memorias a nivel de sistemas. La consolidación de sistemas es un proceso por el cual las memorias inicialmente dependientes del hipocampo se estabilizan en otras áreas de la <a href="AppendixB.qmd#term-id-68">corteza cerebral</a> <span class="citation" data-cites="squire1992">[@squire1992]</span>. Diversos modelos presentados a continuación han explicado la dinámica de este proceso, destacando la importancia de la formación hipocampal y su interacción con la neocorteza en la memoria. Aunque estos modelos se enfocan en diferentes aspectos de la función del hipocampo, todos reconocen su papel esencial en la consolidación de memorias episódicas.</p>
+<div id="callout-modeloestandar" class="callout callout-style-simple callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Modelo estándar de consolidación</strong>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>El primero en proponer formalmente este modelo fue David <span class="citation" data-cites="marr1971">@marr1971</span>, quien utilizando modelamiento computacional planteó que el hipocampo podía almacenar temporalmente la información antes de su procesamiento adicional en la <a href="AppendixB.qmd#term-id-68">neocorteza</a> para el almacenamiento a largo plazo. Evidencia experimental <span class="citation" data-cites="alvarez1994 knowlton1998">[@alvarez1994; @knowlton1998]</span> parecía apoyar esta teoría, indicando que el hipocampo actúa como un almacén temporal para las memorias recientes y que, con el tiempo, estas memorias se transfieren a la neocorteza para su almacenamiento a largo plazo. Una vez que las memorias han sido consolidadas en la neocorteza, el hipocampo ya no es necesario para su recuperación. Sin embargo, esta “transferencia” de memoria del hipocampo a la neocorteza es un concepto que otros modelos de consolidación cuestionan <span class="citation" data-cites="willshaw2015 winocur2010 kandel2014">[@willshaw2015; @winocur2010; @kandel2014]</span>.</p>
+</div>
+</div>
+<div id="callout-trazamultiple" class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Modelo de la traza múltiple</strong>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Este modelo <span class="citation" data-cites="nadel1997 nadel2000 nadel2007">[@nadel1997; @nadel2000; @nadel2007]</span> propone que el papel del hipocampo no se limita únicamente a la <a href="AppendixB.qmd#term-id-10">consolidación</a> inicial de la memoria, extendiendo su función en la <a href="AppendixB.qmd#term-id-12">evocación</a> de la memoria. Esta evocación puede resultar en la formación de nuevas trazas en el hipocampo, un concepto conocido como <a href="AppendixB.qmd#term-id-11">reconsolidación</a>. El impacto de este fenómeno sobre la conducta <a href="#callout-reconsolidacion">se expande más adelante</a>.</p>
+<p>La principal diferencia con el <a href="#callout-modeloestandar">modelo estándar de consolidación</a> es que esta teoría sostiene que el hipocampo proporciona el contexto espacial y temporal del recuerdo mientras la memoria siga siendo accesible <span class="citation" data-cites="kandel2014">[@kandel2014]</span>, no solo en las primeras etapas de la consolidación como propone el modelo estándar. Además, el modelo sugiere que las memorias antiguas, que han sido <a href="AppendixB.qmd#term-id-12">evocadas</a> y reforzadas repetidamente, pueden desarrollar múltiples trazas en el hipocampo. Estas trazas adicionales hacen que las memorias sean más resistentes al olvido <span class="citation" data-cites="lee2009">[@lee2009]</span>. Sin embargo, con el tiempo estas memorias tienden a perder detalles específicos y a convertirse en representaciones más abstractas o generalizadas. Investigaciones más recientes <span class="citation" data-cites="lesburgueres2011 kitamura2017 goto2021">[@lesburgueres2011; @kitamura2017; @goto2021]</span> parecen soportar esta hipótesis, indicando que el hipocampo es necesario en las primeras fases del aprendizaje, en la maduración de la memoria hacia la neocorteza y en la <a href="(#callout-reconsolidacion)">evocación y reconsolidación</a> de la memoria.</p>
+</div>
+</div>
+<div id="callout-contruccion" class="callout callout-style-simple callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Teoría de Construcción de escenario</strong>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>En esta teoría <span class="citation" data-cites="hassabis2007 hassabis2009">[@hassabis2007; @hassabis2009]</span> se expande la función y relevancia del hipocampo y la neocorteza más allá de la consolidación de la memoria y destaca su papel crucial en la imaginación y la simulación de eventos futuros <span class="citation" data-cites="quiroga2020">[@quiroga2020]</span>. De acuerdo con esta teoría, el hipocampo permite a los individuos crear y manipular escenarios mentales, esencial tanto para recordar el pasado como para planificar el futuro. Esta capacidad para construir escenarios puede ayudar en la toma de decisiones y en la resolución de problemas al permitir a las personas imaginar diferentes posibilidades y sus consecuencias. Además, esta teoría implica que la evocación de recuerdos pasados a partir de la información almacenada es un proceso “reconstructivo” <span class="citation" data-cites="maguire2013">[@maguire2013]</span> en lugar de una recuperación de una memoria perfecta. Esta idea resalta que las memorias pueden ser <em>reformadas</em> continuamente por nuevas experiencias <span class="citation" data-cites="moscovitch2022">[@moscovitch2022]</span> y alterar las conductas <span class="citation" data-cites="gilboa2021">[@gilboa2021]</span> y estados emocionales asociadas a los recuerdos <span class="citation" data-cites="cowan2021">[@cowan2021]</span>.</p>
+</div>
+</div>
+</section>
+<section id="sec-mapa" class="level3">
+<h3 class="anchored" data-anchor-id="sec-mapa">Mapas Cognitivos</h3>
+<p>Otra teoría importante sobre la función de la formación hipocampal es que genera una representación neuronal del entorno espacial, creando un <em>mapa cognitivo</em> <span class="citation" data-cites="okeefe1979">[@okeefe1979]</span>. Esta idea fue propuesta por <span class="citation" data-cites="tolman1948">@tolman1948</span> y desarrollada gracias al descubrimiento de las “células de lugar” <span class="citation" data-cites="okeefe1971">[@okeefe1971]</span> en el hipocampo (principalmente en las regiones 1 y 3) <span class="citation" data-cites="fox1975">[@fox1975]</span>. Estas neuronas se activan de manera específica cuando un animal se encuentra en una ubicación particular y permite generar este mapa como una representación mental del entorno físico de un individuo.</p>
+<!-- \colorbox{Turquoise}{no entendí} -->
+<p>Tal <em>mapa cognitivo</em> permite a los organismos navegar y comprender su entorno al codificar información sobre relaciones espaciales y puntos de referencia <span class="citation" data-cites="andersen2007">[@andersen2007]</span>, lo cual explica por qué ratones con lesiones en el hipocampo no pueden generar estrategias espaciales para recordar la posición de escape en un laberinto <span class="citation" data-cites="morris1982">[@morris1982]</span>. La teoría del mapa cognitivo tiene profundas implicaciones para comprender no solo la memoria espacial, sino también cómo el cerebro organiza y recupera información relacional <span class="citation" data-cites="eichenbaum2004">[@eichenbaum2004]</span>: La formación hipocampal ayuda a asociar elementos de una experiencia (qué pasó, dónde y cuándo) con un contexto y tiempo específico <span class="citation" data-cites="whittington2020">[@whittington2020]</span>. En consecuencia, al recordar una memoria, la formación hipocampal ayuda a reconstruir la experiencia reuniendo los diferentes elementos de la memoria y permite a los individuos usar la información de maneras nuevas y flexibles <span class="citation" data-cites="eichenbaum2017">[@eichenbaum2017]</span>. Este procesamiento relacional ocurre durante la codificación, pero se hace evidente durante la recuperación de la memoria en diferentes circunstancias <span class="citation" data-cites="lee2009">[@lee2009]</span>, una idea asociada con la <em>flexibilidad</em> en la memoria, ya que podemos recordar hechos y eventos desde contextos diferentes al aprendizaje inicial <span class="citation" data-cites="uddin2021">[@uddin2021]</span>. La relevancia de esta flexibilidad de la memoria sobre la salud mental <a href="#callout-reconsolidacion">se explica a continuación</a>.</p>
+<div id="callout-reconsolidacion" class="callout callout-style-simple callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Evocación, reconsolidación y distrés</strong>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="#callout-trazamultiple">Como se mencionó previamente</a>, la recuperación de una memoria (<a href="AppendixB.qmd#term-id-12"><em>evocación</em></a>) y la <a href="AppendixB.qmd#term-id-11"><strong>reconsolidación</strong></a> de una memoria son procesos distintos, pero relacionados con la gestión de los recuerdos y la conducta.</p>
+<p>La <strong><em>evocación</em></strong> se puede definir como <em>la recuperación de una memoria por la cual se accede y se trae a la conciencia un recuerdo consolidado</em>. Este proceso implica la activación de las redes neuronales (<a href="AppendixB.qmd#term-id-1">engramas</a>) que codificaron originalmente la información <span class="citation" data-cites="tonegawa2018">[@tonegawa2018]</span>, particularmente en el hipocampo y la neocorteza. La memoria evocada permanece estable durante su recuperación.</p>
+<p>La <strong><em>reconsolidación</em></strong> se refiere a un fenómeno que puede ocurrir después de que una memoria ha sido evocada. En este caso, la memoria es temporalmente inestable y susceptible a modificaciones, permitiendo actualizar el recuerdo original <span class="citation" data-cites="tronson2007 lee2009">[@tronson2007; @lee2009]</span>. En este caso, la memoria tiene que ser estabilizada nuevamente mediante la síntesis de proteínas <em>de novo</em> <span class="citation" data-cites="sara2000 nader2000 lods2021">[@sara2000; @nader2000; @lods2021]</span> por mecanismos similares a la <a href="AppendixB.qmd#term-id-11">consolidación</a> inicial de la memoria (activación de receptores y modulación de la plasticidad sináptica).</p>
+<p>La actualización de la memoria durante la reconsolidación es un punto de interés para el tratamiento de padecimientos mentales donde el fallo en la flexibilidad de la memoria genera <a href="AppendixB.qmd#term-id-18">distrés</a>. El <em>distrés</em> se refiere a una respuesta biológica o emocional aversiva para el individuo y se diferencia del estrés en que este último puede ser adaptativo para la función cognitiva <span class="citation" data-cites="vangerven2016">[@vangerven2016]</span> o la neocorteza <span class="citation" data-cites="kriesche2023">[@kriesche2023]</span>. La experiencia subjetiva desagradable del distrés incluye estados emocionales que pueden inducir padecimientos como ansiedad y depresión <span class="citation" data-cites="ridner2004">[@ridner2004]</span>, ambos asociados a una incapacidad <em>percibida</em> de afrontar las demandas ambientales que generan cambios en el estado emocional, malestar físico y diversas alteraciones cognitivas <span class="citation" data-cites="matthews2016">[@matthews2016]</span>.</p>
+</div>
+</div>
+</section>
+<section id="sec-nha" class="level3">
+<h3 class="anchored" data-anchor-id="sec-nha">Neurogénesis adulta en el Giro dentado</h3>
+<p>El es una de las pocas áreas del cerebro adulto que genera constantemente nuevas neuronas, un fenómeno conocido como . Este descubrimiento desafió la antigua creencia de que el cerebro adulto es incapaz de generar nuevas neuronas a lo largo de la vida, creencia que se originó con la propuesta de la “<em>doctrina de la neurona</em>” basada en el trabajo de Santiago Ramón y Cajal. En efecto, en el año 1913, Ramón y Cajal escribió: “<em>En el adulto, las terminales nerviosas son fijas e inmutables. Todo puede morir, pero nada se puede regenerar</em>” <span class="citation" data-cites="kumar2019">[historia del concepto revisada en @kumar2019]</span>. Utilizando timidina tritiada, el estudio pionero de <span class="citation" data-cites="altman1965">@altman1965</span> presentó la primera evidencia de la presencia de células no diferenciadas en la capa granular del en el hipocampo de ratas adultas. Décadas después, utilizando técnicas de inmunohistoquímica en cerebros <em>post -mortem</em> de pacientes con cáncer que habían recibido (análogo de la timidina) para fines diagnósticos, <span class="citation" data-cites="eriksson1998">@eriksson1998</span> mostraron por primera vez evidencia de neurogénesis en el de humanos. Estudios subsecuentes demostraron que este fenómeno no solo es crucial para la plasticidad hipocampal <span class="citation" data-cites="toda2018">[@toda2018]</span> y probablemente para la adquisición de memorias dependientes del hipocampo <span class="citation" data-cites="suarez-pereira2015">[@suarez-pereira2015]</span>, sino que también se ha vinculado con la regulación del estado de ánimo y la respuesta al estrés <span class="citation" data-cites="anacker2017">[@anacker2017]</span>.</p>
+<p>La NHA implica la proliferación de células progenitoras neurales, su diferenciación en neuronas y su integración eventual en circuitos neuronales funcionales, como se describe más a detalle en la <a href="#fig-neurogenesishipo" class="quarto-xref">Figure&nbsp;4</a>. La NHA también es regulada por otros tipos de células no ilustradas en la <a href="#fig-neurogenesishipo" class="quarto-xref">Figure&nbsp;4</a>, incluyendo interneuronas <span class="citation" data-cites="groisman2020">[@groisman2020]</span>, células gliales y la matriz extracelular <span class="citation" data-cites="cope2019">[@cope2019]</span>. Las interneuronas del modulan la excitabilidad neuronal, influyendo en un balance adecuado de excitación e inhibición crucial para la supervivencia y la maduración de las nuevas neuronas <span class="citation" data-cites="barrutieta-arberas2023">[@barrutieta-arberas2023]</span>. Además, juegan un papel en la sincronización de la actividad neuronal en redes hipocampales (<a href="#fig-inhibicion" class="quarto-xref">Figure&nbsp;7</a>). Por otro lado, los astrocitos son cruciales para la supervivencia y el crecimiento de las células en desarrollo por varios mecanismos <span class="citation" data-cites="elsayed2015">[@elsayed2015]</span>, como el mantenimiento de la homeostásis del medio extracelular y la secreción de factores neurotróficos —p.&nbsp;ej. el — que promueven la supervivencia, proliferación, y diferenciación <span class="citation" data-cites="araki2021">[@araki2021]</span> neuronal. La matriz extracelular, por otro lado, proporciona un entorno tridimensional que guía la migración y la integración de las nuevas neuronas en el circuito <span class="citation" data-cites="cope2019">[@cope2019]</span>.</p>
+<div id="fig-neurogenesishipo" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-scap="Neurogénesis Adulta hipocampal">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-neurogenesishipo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/neurogenesis_hipocampal.png" class="img-fluid figure-img" style="width:85.0%" data-fig-scap="Neurogénesis Adulta hipocampal">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-neurogenesishipo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Neurogénesis Adulta en el . La figura ilustra el proceso de , mostrando las diferentes etapas desde la célula troncal neural hasta la integración de neuronas maduras en los circuitos neuronales. Este proceso se desarrolla en un lapso de tiempo que abarca varias semanas. <em>Etapas de la Neurogénesis Adulta</em> <span class="citation" data-cites="batool2019 denoth-lippuner2021">[@batool2019; @denoth-lippuner2021]</span>: <strong>Célula Troncal Neural o Célula de Tipo-1</strong> (0-3 días): Estas células, localizadas en la capa subgranular, tienen la capacidad de proliferar y diferenciarse cuando reciben los estímulos adecuados, como ejercicio aeróbico<span class="citation" data-cites="mustroph2012">[@mustroph2012]</span>. <strong>Células Progenitoras intermedias o progenitores neurales</strong> (hasta los 7 días): Poseem una alta capacidad proliferativa y se dividen varias veces aumentando la población de células precursoras que eventualmente se convertirán en neuronas. <strong>Neuroblasto</strong> (semana 1 a 2): Los progenitores neurales se diferencian en neuroblastos, que comienzan a mostrar características neuronales. <strong>Migración</strong> (semana 2 a 4): Los neuroblastos migran hacia las capas granulares del en el hipocampo. Durante esta migración, los neuroblastos continúan madurando y establecen sus primeras proyecciones a CA3. Durante las primeras tres semanas, la mayoría de estas células mueren por apoptosis dependiente de BAX, mientras que la <em>supervivencia</em> es mediada por un mecanismo dependiente de . <strong>Maduración y Sinaptogénesis</strong> (semana 4 a 8): Las nuevas neuronas continúan madurando, desarrollan un árbol dendrítico más elaborado y aumentan la densidad de espinas dendríticas, que son los sitios donde se forman las sinapsis excitatorias. En esta etapa, las nuevas neuronas establecen conexiones más específicas y fuertes con neuronas preexistentes, comenzando a participar en la actividad sináptica del circuito (integración funcional). Información tomada de <span class="citation" data-cites="batool2019">@batool2019</span> y <span class="citation" data-cites="denoth-lippuner2021">@denoth-lippuner2021</span>
+</figcaption>
+</figure>
+</div>
+<p>Las principales teorías que abordan los roles cognitivos influenciados por la incluyen su papel en el aprendizaje y la recuperación de la memoria. Estos fenómenos que se describen a continuación explican la regulación de la memoria y la conducta desde diferentes enfoques (<span class="citation" data-cites="berdugo-vega2023">@berdugo-vega2023</span>) que pueden estar actuando de manera sinérgica (<span class="citation" data-cites="anacker2017">@anacker2017</span>).</p>
+<div id="callout-NHAmecanismos" class="callout callout-style-simple callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>NHA: mecanismos que modulan la conducta</strong>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Separación de Patrones</strong> <span class="citation" data-cites="sahay2011">[@sahay2011]</span>: Esta teoría destaca la gran cantidad de células granulares en el en comparación con las neuronas en la (una proporción de 5:1) <span class="citation" data-cites="chavlis2017">[@chavlis2017]</span>. El mayor número de células granulares ayuda a crear grupos no superpuestos a partir de entradas similares recibidas de la , produciendo salidas que combinan información de maneras significativas hacia CA3 sin interferir entre ellas. Esta representación de memorias similares de forma <a href="AppendixB.qmd#term-id-7">ortogonal</a> (distintas) ayuda a distinguir efectivamente patrones de entrada similares.</p>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout="[50, -5, 45]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-separacionpatrones" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-separacionpatrones-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/neurogenesis_separacion_patrones.png" class="img-fluid figure-img" style="width:90.0%">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-separacionpatrones-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Separación de patrones.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 5.0%;justify-content: flex-start;">
+<p>&nbsp;</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 45.0%;justify-content: flex-start;">
+<p>Durante la presentación de estimulos que generen patrones de actividad similares en la , la neurogénesis hipocampal permite reclutar grupos no superpuestos de células granulares que a su vez activan poblaciones distintas de células en CA3. El resultado la capacidad de distinguir entre experiencias similares pero no idénticas. Ilustración basada en <span class="citation" data-cites="borzello2023">@borzello2023</span></p>
+</div>
+</div>
+</div>
+<p><strong>Olvido y reaprendizaje</strong> <span class="citation" data-cites="feng2001 akers2014 epp2016 adlaf2017">[@feng2001; @akers2014; @epp2016; @adlaf2017]</span>: La incorporación de nuevas neuronas puede remodelar las redes neuronales existentes, potencialmente alterando o debilitando las conexiones sinápticas previamente establecidas (<a href="#fig-olvido" class="quarto-xref">Figure&nbsp;6</a>). Este proceso puede interferir con las memorias antiguas e inducir la “limpieza” de estas memorias a la vez que facilita la adquisición de nuevas asociaciones (reaprendizaje). En este caso, el olvido también previene la interferencia de memorias (al igual que en la separación de patrones) <span class="citation" data-cites="olpe2023">[@olpe2023]</span>, pero por otro mecanismo con implicaciones distintas.</p>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout="[45, 45]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-olvido" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-olvido-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/neurogenesis_olvido.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-olvido-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Desplazamiento de contactos sinápticos previos por las terminales de nuevas neuronas.
+</figcaption>
+</figure>
+</div>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p>La integración de nuevas neuronas puede requerir ajustes en las sinapsis existentes. En el primer panel, un axón de una nueva neurona (en ) es guiado por señales del medio (p.ej. neurotrofinas) <span class="citation" data-cites="olpe2023">[@olpe2023 ]</span>. El cono de crecimiento es guiado por proteínas asociadas a actina <span class="citation" data-cites="bailey2008">[@bailey2008]</span> hasta alcanzar las dendritas de CA3 aproximadamente dos semanas después de su nacimiento; sin embargo, el contacto sináptico compienza hasta las 4 semanas (panel II) <span class="citation" data-cites="toni2011 toni2007">[@toni2011;@toni2007]</span>, donde el <a href="AppendixB.qmd#term-id-52">lamelopodio</a> se comienza a transformar en una terminal presináptica vestigial que inicia el ensamblaje sináptico mediado por CAMs (por sus siglas en inglés, <em>Cell Adhesion Molecules</em>). La integración de la nueva neurona modifica el circuito previamente formado (en ) (panel II) y compite con éste (panel III) <span class="citation" data-cites="toni2015 toni2015">[@toni2015; @toni2015]</span>, contribuyendo posiblemente a fenómenos como el olvido al reemplazar el circuito antiguo <span class="citation" data-cites="yau2015 zhao2013">[@yau2015; @zhao2013]</span>. Figura basada en los trabados de <span class="citation" data-cites="toni2015">@toni2015</span> y <span class="citation" data-cites="toni2015">@toni2015</span></p>
+</div>
+</div>
+</div>
+<p><strong>Filtrado de información</strong> <span class="citation" data-cites="borzello2023">[@borzello2023]</span>: Esta teoría propone que el filtra patrones de entrada débiles o inconsistentes, permitiendo que solo pasen patrones fuertes o persistentes. Este evento es promovido por la capacidad de las neuronas recién nacidas para mantener un tono inhibitorio en el (<a href="#fig-inhibicion" class="quarto-xref">Figure&nbsp;7</a>) <span class="citation" data-cites="mcavoy2015 mchugh2022">[@mcavoy2015; @mchugh2022]</span>.</p>
+<p>Uno de los aspectos más interesantes y cruciales de este proceso es que, inicialmente, las nuevas neuronas son activadas predominantemente por el neurotransmisor <span class="citation" data-cites="groisman2020">[@groisman2020]</span>, que es típicamente inhibitorio en neuronas maduras. En las neuronas inmaduras, hay una alta concentración de iones de cloro dentro de la célula debido a la actividad del cotransportador <span class="math inline">\(Na^+\)</span> <span class="math inline">\(K^+\)</span> <span class="math inline">\(Cl^-\)</span> (nkcc1). Cuando el se une a sus receptores (canales de cloro), en la neurona nueva éste provoca una <em>salida</em> de iones <span class="math inline">\(Cl^-\)</span> de la célula, lo que lleva a una <em>despolarización</em> de la membrana y a la excitación de la neurona. A medida que la neurona madura, ocurre un cambio en la expresión de transportadores de cloro. El cotransportador <span class="math inline">\(K^+\)</span> <span class="math inline">\(Cl^-\)</span> (kcc2) comienza a ser expresado en mayor medida, lo que reduce la concentración de cloro intracelular. En esta etapa, la apertura de los receptores érgicos permite la <em>entrada</em> de iones de cloro generando la hiperpolarización de la neurona. Por ende, antes de las seis semanas, las neuronas recién nacidas se caracterizan por su hiperexcitabilidad y alta plasticidad sináptica como consecuencia de la inhibición reducida <span class="citation" data-cites="ge2007">[@ge2007]</span>. Sumado a esto, las nuevas neuronas pueden inducir una inhibición lateral de neuronas granulares madulras <span class="citation" data-cites="luna2019">[@luna2019]</span> (<a href="#fig-inhibicion" class="quarto-xref">Figure&nbsp;7</a>).</p>
+<p>Durante este período de 4-6 semanas, la actividad de la red del es generalmente inhibida por interneuronas que expresan parvalbúmina y somatostatina, las cuales establecen conexiones con las células granulares nuevas. La neurogénesis adulta produce una población neuronal que permanece en gran medida apartada del tono inhibidor dominante en el y proporciona un canal de información paralelo para el procesamiento de entradas no superpuestas <span class="citation" data-cites="groisman2020">[@groisman2020]</span>.</p>
+<div id="fig-inhibicion" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-scap="Filtrado e inhibición en el \ac{gd}">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-inhibicion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/neurogenesis_inhibicion.png" class="img-fluid figure-img" style="width:80.0%" data-fig-scap="Filtrado e inhibición en el \ac{gd}">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-inhibicion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Filtrado e inhibición. Teoría de filtrado de información en el y su relación con la . La figura ilustra cómo el GD filtra patrones de entrada débiles o inconsistentes, lo que permite el paso sólamente de patrones fuertes o persistentes. <em>Neurona Inmadura</em>: Representada en verde, estas células recién nacidas en el GD tienen una alta excitabilidad y juegan un papel crucial en la modulación de la actividad del GD. <em>Interneurona</em>: Representada en azul, estas células son reclutadas por neuronas recién nacidas y participan en la inhibición y filtrado de estímulos. <em>Neurona Madura</em>: Representada en rojo, estas células se integraron al circuito maduro del y proyectan hacia la región CA3 del hipocampo participando en la transmisión de señales. El gráfico de “Umbral de excitabilidad” muestra cómo los estímulos deben superar un umbral para generar una respuesta en el GD-CA3. La ausencia de nuevas neuronas resulta en una hiperexcitabilidad en la región CA3, lo que puede interferir con el reaprendizaje. Esta condición se ilustra con un patrón rojo denso y desorganizado de conexiones sinápticas. La presencia de nuevas neuronas aumenta la inhibición a través del reclutamiento de interneuronas, lo que reduce la hiperexcitabilidad y permite un filtrado efectivo de estímulos. Esto se representa con un patrón azul más claro y organizado de conexiones sinápticas <span class="citation" data-cites="burghardt2012 lacefield2012 luna2019">[@burghardt2012; @lacefield2012; @luna2019]</span>. Figura basada en el trabajo de <span class="citation" data-cites="anacker2017">@anacker2017</span>
+</figcaption>
+</figure>
+</div>
+<p><strong>Detección de Novedad</strong> <span class="citation" data-cites="vinogradova1975">[@vinogradova1975]</span>: Las nuevas neuronas muestran una mayor actividad durante experiencias nuevas o cambiantes, promoviendo el reclutamiento de diferentes grupos celulares cuando se introducen nuevos estímulos. Este fenómeno está relacionado con las propiedades de las neuronas recién nacidas en el del hipocampo, que poseen alta plasticidad y son especialmente sensibles a nuevas experiencias <span class="citation" data-cites="borzello2023">[@borzello2023]</span>. Como señalan <span class="citation" data-cites="groisman2020">@groisman2020</span>, las células granulares recién nacidas en el hipocampo muestran una alta excitabilidad y un umbral bajo para inducir procesos de plasticidad, como LTP, durante las primeras 4-6 semanas después de su nacimiento.</p>
+<!-- **Teoría del Engrama** [@kitamura2017]: Para el recuerdo de la memoria, el \ac{gd} mantiene y reactiva representaciones estables de experiencias previamente codificadas (*engramas*). Esto es esencial para iniciar el proceso de recuerdo en el circuito hipocampal al reactivar patrones de actividad asociados con experiencias pasadas. -->
+<p><strong>Indexación y Etiquetado Temporal</strong> <span class="citation" data-cites="teyler1986 manns2007">[@teyler1986; @manns2007]</span>: Estas teorías proponen que la mayor excitabilidad del se debe al reclutamiento continuo de células granulares recién nacidas y altamente excitables a lo largo del tiempo. Esta incorporación continua de células adultas permite al codificar índices únicos (p.&nbsp;ej., <a href="AppendixB.qmd#term-id-1">engramas</a>) para memorias que se almacenan de manera cronológica, facilitando la distinción secuencial de eventos temporales.</p>
+</div>
+</div>
+<div id="callout-MWMfc" class="callout callout-style-simple callout-important no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Estudio de la NHA en modelos animales e implicaciones sobre la flexibilidad cognitiva</strong>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Varias líneas de investigación <span class="citation" data-cites="anacker2017">[@anacker2017]</span> señalan que la es esencial para la <a href="@AppendixB.qmd#term-id-19">flexibilidad cognitiva</a>, la cual permite la adaptación de pensamientos y conductas a nuevas situaciones <span class="citation" data-cites="uddin2021">[@uddin2021]</span> mediante la formación y recuperación de recuerdos contextuales y espaciales <span class="citation" data-cites="okeefe1990">[@okeefe1990]</span>, así como la integración de nueva información con experiencias pasadas (<a href="#fig-flexneuro" class="quarto-xref">Figure&nbsp;8</a>) <span class="citation" data-cites="epp2016 martinez-canabal2019 scott2021">[@epp2016; @martinez-canabal2019; @scott2021]</span>. Por otro lado, las alteraciones en la NHA disminuyen la flexibilidad cognitiva <span class="citation" data-cites="garthe2016 epp2016">[@garthe2016; @epp2016]</span>, como se observa en trastornos depresivos y de ansiedad <span class="citation" data-cites="uddin2021">[@uddin2021]</span>.</p>
+<p>El estudio de la flexibilidad cognitiva en el aprendizaje y la memoria espacial en modelos animales proviene del desarrllo de experimentos en laberintos que datan de principios del siglo XX <span class="citation" data-cites="goodman2024">[@goodman2024]</span>. <span class="citation" data-cites="small1900">@small1900</span> inició la experimentación en laberintos comparando las habilidades mentales de ratas salvajes y domesticadas, registrando el tiempo y errores cometidos al resolver el laberinto. A partir de este trabajo pionero, se realizaron cada vez más protocolos conductuales en distintos laberintos tanto terrestres, como acuáticos <span class="citation" data-cites="vorhees2006">[@vorhees2006]</span>. En general, se distinguen dos fases importantes en el aprendizaje en los laberintos <span class="citation" data-cites="othman2022">[@othman2022]</span>: una fase de <em>descubrimiento</em>, donde el animal aprende a recorrer el laberinto para obtener una recompensa, y una fase que implica mejorar la resolución del laberinto, cada vez con menos errores <span class="citation" data-cites="tolman1927">[@tolman1927]</span>, un indicador de aprendizaje.</p>
+<p>Un laberinto que sigue siendo clave para entender los distintos aspectos de la memoria (consolidación, retención, evocación, reconsolidación) es el <strong></strong> <span class="citation" data-cites="morris1981">[@morris1981]</span>. Entre sus múltples protocolos, permite el estudio de memorias dependientes del hipocampo (p.ej. memoria espacial) <span class="citation" data-cites="hernandez-mercado2022">[@hernandez-mercado2022]</span> y evaluar la importancia de la neurogénesis hipocampal en la conducta <span class="citation" data-cites="vanpraag1999 garthe2013">[@vanpraag1999; @garthe2013]</span>. El hecho de que diferentes lesiones <span class="citation" data-cites="morris1982">[@morris1982]</span>, como las inducidas por el estrés crónico <span class="citation" data-cites="dhooge2001 vorhees2006">[@dhooge2001; @vorhees2006]</span>, afecten el rendimiento en este laberinto resalta su importancia y su relevancia en establecer la relación entre la neurogénesis hipocampal y la flexibilidad cognitiva, como se ejemplifica en la <a href="#fig-flexneuro" class="quarto-xref">Figure&nbsp;8</a>.</p>
+<div id="fig-flexneuro" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-scap="Neurogénesis y Flexibilidad en la Memoria">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-flexneuro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/flexibilidad_balanza.png" class="img-fluid figure-img" style="width:75.0%" data-fig-scap="Neurogénesis y Flexibilidad en la Memoria">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-flexneuro-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Neurogénesis hipocampal como facilitador de la flexibilidad en la memoria. La figura ilustra cómo la neurogénesis en el hipocampo actúa como un mecanismo que facilita la flexibilidad de la memoria, permitiendo el reaprendizaje y la adaptación a nuevas situaciones. Se presenta un balance entre la neurogénesis y el mantenimiento de memorias antiguas, destacando su impacto en el reaprendizaje de tareas como la prueba del . <em>Parte Izquierda (Neurogénesis Reducida)</em>: Engramas Viejos, representados en rojo, muestran conexiones sinápticas persistentes que dificultan el olvido de memorias antiguas. Impedimento del Reaprendizaje: La reducción en la neurogénesis limita la capacidad de olvidar memorias viejas, lo que a su vez obstaculiza el aprendizaje de nuevas tareas. Este proceso es visualizado mediante la incapacidad de la figura para navegar eficazmente en el laberinto. <em>Parte Derecha (Aumento de la Neurogénesis)</em>: La figura muestra cómo el aumento de la neurogénesis facilita el olvido de memorias viejas (engramas en rojo) y la formación de nuevas memorias (engramas en azul). Facilitación del Reaprendizaje. Un aumento en la neurogénesis permite el olvido de engramas viejos, lo que facilita el reaprendizaje y la adquisición de nuevas habilidades y conocimientos. Este proceso es visualizado mediante la figura navegando exitosamente en el laberinto. Basado en la figura 2 de <span class="citation" data-cites="anacker2017">@anacker2017</span>.
+</figcaption>
+</figure>
+</div>
+<p>La relación entre la y la flexibilidad cognitiva se vuelve especialmente relevante cuando se considera su implicación en trastornos como la ansiedad y la depresión. Las personas con ansiedad y depresión tienden a experimentar pensamientos negativos recurrentes (<a href="AppendixB.qmd#term-id-70">rumiaciones</a>) y/o a generalizar experiencias (ansiedad) (<a href="#fig-flexibilidad" class="quarto-xref">Figure&nbsp;9</a>) <span class="citation" data-cites="denoth-lippuner2021">[@denoth-lippuner2021]</span>, manifestaciones de falta de flexibilidad cognitiva. Esta falta de flexibilidad dificulta la capacidad para desvincularse de estos pensamientos negativos, prolongando y exacerbando el malestar emocional <span class="citation" data-cites="guler2022">[@guler2022]</span>.</p>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout="[60, 40]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 60.0%;justify-content: flex-start;">
+<p> <span class="citation" data-cites="anacker2017 waltz2017 doss2021">[@anacker2017; @waltz2017; @doss2021]</span>, <span class="citation" data-cites="garthe2016 jett2017">[@garthe2016; @jett2017]</span>. <em>Flexibilidad Cognitiva (camino azul)</em>: . Basado en las ideas de <span class="citation" data-cites="guler2022">@guler2022</span> y <span class="citation" data-cites="uddin2021">@uddin2021</span>.</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 40.0%;justify-content: flex-start;">
+<div id="fig-flexibilidad" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-flexibilidad-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/flexibilidad_cognitiva.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-flexibilidad-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Flexibilidad cognitiva y trastornos mentales.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>Sin embargo, como se resaltan en numerosas investigaciones <span class="citation" data-cites="young2009 young2021 maei2009a garthe2013 hernandez-mercado2022">[@young2009; @young2021; @maei2009a; @garthe2013; @hernandez-mercado2022]</span>, estudios sobre la función cognitiva en modelos de roedores utilizando el ha dependido predominantemente del análisis de métricas subóptimas que no modelan los procesos cognitivos que se quieren representar. Si bien estos métodos han proporcionado valiosos conocimientos, existen novedosos enfoques que pueden proporcionar interpretaciones más matizadas de los datos y el impacto de la NHA sobre la flexibilidad. Debido a que la interpretación de los datos obtenidos en el MWM es crucial para el entendimiento de los impactos cognitivos que tiene el estrés crónico, se debe tener en cuenta esto y utilizar métricas y análisis adecuados.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="estrés-y-cognición" class="level2">
+<h2 class="anchored" data-anchor-id="estrés-y-cognición">Estrés y Cognición</h2>
+<p><span class="citation" data-cites="lazarus2006">@lazarus2006</span> define el estrés como la reacción interna del cuerpo ante cualquier estímulo externo que se considere no placentero o dañino. Como señala Lazarus en su libro, cada individuo experimenta y afronta los estímulos aversivos de manera diferente. Estas diferencias están influenciadas por factores psicológicos, biológicos y ambientales <span class="citation" data-cites="tafet2016">[@tafet2016]</span>. No obstante, en presencia de estresores crónicos, impredecibles e incontrolables, la capacidad fisiológica para enfrentar estos estímulos puede verse superada, contribuyendo así al desarrollo de trastornos mentales, como los trastornos depresivos o de ansiedad <span class="citation" data-cites="hill2012">[@hill2012]</span>.</p>
+<p>A nivel cognitivo, los efectos del estrés crónico incluyen dificultad en la formación de memorias episódicas y dificultades para adaptar pensamientos y conductas de forma flexible <span class="citation" data-cites="sandi2013">[@sandi2013]</span>. A nivel emocional, estas alteraciones cognitivas contribuyen y mantienen los síntomas de estrés y ansiedad que dificultan la recuperación del individuo <span class="citation" data-cites="anacker2017">[@anacker2017]</span>. Estas alteraciones están íntimamente relacionadas con los efectos que el estrés crónico tiene sobre la formación hipocampal <span class="citation" data-cites="el-aziz2022">[@el-aziz2022]</span>.</p>
+<section id="respuesta-de-la-formación-hipocampal-al-estrés" class="level3">
+<h3 class="anchored" data-anchor-id="respuesta-de-la-formación-hipocampal-al-estrés">Respuesta de la formación hipocampal al estrés</h3>
+<p>La formación hipocampal es una estructura particularmente sensible al estrés crónico <span class="citation" data-cites="cobb2013">[@cobb2013]</span>. Hace casi tres décadas, <span class="citation" data-cites="sheline1996">@sheline1996</span> examinaron los cambios en el volumen del hipocampo en pacientes con trastorno depresivo mayor utilizando resonancia magnética y encontraron una reducción del 12%–16% en el volumen del hipocampo en ambos hemisferios. En otro estudio, <span class="citation" data-cites="steffens2000">@steffens2000</span> incluyeron a pacientes geriátricos y confirmaron una reducción del 4%–7% en el volumen del hipocampo en comparación con los controles sin diagnóstico depresivo. Más recientemente, <span class="citation" data-cites="treadway2015">@treadway2015</span> reportaron una reducción del volumen del hipocampo en pacientes con trastorno depresivo mayor y una correlación inversa entre el número de episodios depresivos y el volumen del .</p>
+<p>El mecanismo principal que parece inducir estos cambios estructurales está relacionado con los niveles elevados de glucocorticoides en respuesta al estrés crónico <span class="citation" data-cites="conrad2008">[@conrad2008]</span>. Estos pueden generar atrofia de dendritas en 3 <span class="citation" data-cites="fuchs1998">[@fuchs1998]</span> y <span class="citation" data-cites="bessa2009">[@bessa2009]</span>, así como una reducción de la <span class="citation" data-cites="hill2015">[@hill2015]</span>. En conjunto, estos daños se observan en los hipocampos con menores volúmenes en pacientes que experimentan constantemente estrés crónico y cuadros depresivos <span class="citation" data-cites="anand2012">[@anand2012]</span>. Este mecanismo inicia con la activación del eje , responsable de la liberación de <a href="AppendixB.qmd#term-id-32">glucocorticoides</a>. Cuando enfrentamos un estresor, el hipotálamo secreta , que a su vez hace que la glándula pituitaria anterior libere (<a href="#fig-HPA" class="quarto-xref">Figure&nbsp;10</a>). La viaja a través del torrente sanguíneo hasta las glándulas suprarrenales, donde fomenta la liberación de <em>glucocorticoides</em>, principalmente <em>cortisol</em> en los humanos. El <em>cortisol</em> luego envía señales al hipotálamo y la pituitaria para detener la liberación de y , regulando así la actividad de este eje <span class="citation" data-cites="silverman2012">[@silverman2012]</span>. Sin embargo, el estrés crónico puede alterar esta regulación y generar niveles constantemente altos de <em>cortisol</em> asociados al desarrollo de distintas patologías <span class="citation" data-cites="sandi2013 hurtubise2017">[@sandi2013; @hurtubise2017]</span>.</p>
+<div id="fig-HPA" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-scap="Regulación del Eje HPA en respuesta al estrés" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-HPA-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/HPA_long.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-fig-scap="Regulación del Eje HPA en respuesta al estrés">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-HPA-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Regulación del Eje en respuesta al estrés. El proceso comienza en el hipotálamo (1), que en respuesta a señales de estrés, secreta . La actúa sobre la pituitaria anterior (2), estimulando la liberación de en el torrente sanguíneo. La , a su vez, actúa sobre las glándulas suprarrenales (3), promoviendo la secreción de cortisol <span class="citation" data-cites="silverman2012">[@silverman2012]</span>. El sistema de retroalimentación negativa está representado por las señales de inhibición (indicadas por los símbolos negativos rojos), donde niveles elevados de cortisol inhiben tanto la secreción de en el hipotálamo como la secreción de en la pituitaria anterior, ayudando a mantener la homeostasis y evitar una respuesta excesiva al estrés <span class="citation" data-cites="dealcubierre2023">[@dealcubierre2023]</span>. Las flechas verdes con el signo positivo indican la activación de cada componente del eje . Información tomada de <span class="citation" data-cites="silverman2012">@silverman2012</span>
+</figcaption>
+</figure>
+</div>
+<p>Es importante señalar que las alteraciones en la regulación del eje no solo afectan a la liberación de cortisol, sino que también tienen implicaciones significativas en otras áreas del cerebro, como las <a href="AppendixB.qmd#term-id-49">células granulares</a> del . Estas células granulares son de las pocas neuronas que expresan tanto receptores de <em>mineralocorticoides</em> (p.&nbsp;ej. <em>aldosterona</em>) como de <em>glucocorticoides</em> (p.&nbsp;ej. <em>cortisol</em>) <span class="citation" data-cites="reul1985">[@reul1985]</span>. Por lo tanto, no es sorprendente que las células granulares sean especialmente susceptibles al daño por niveles elevados de hormonas suprarrenales <span class="citation" data-cites="boldrini2012">[@boldrini2012]</span>. Adicionalmente, las hormonas que se secretan en respuesta al estrés también tienen un impacto profundo en la regulación de varios neurotransmisores en el cerebro, incluyendo la <span class="citation" data-cites="alenina2015">[@alenina2015]</span>, un neurotransmisor crucial involucrado en la regulación del estado de ánimo <span class="citation" data-cites="zmudzka2018">[@zmudzka2018]</span>.</p>
+</section>
+<section id="sistema-serotoninérgico" class="level3">
+<h3 class="anchored" data-anchor-id="sistema-serotoninérgico">Sistema serotoninérgico</h3>
+<p>La mayoría de las neuronas serotoninérgicas en el sistema nervioso se encuentran dentro de los límites de los “<em>núcleos del rafé</em>” <span class="citation" data-cites="tafet2016">[@tafet2016]</span>. Estos núcleos se pueden clasificar, basándose en su distribución y proyecciones principales, en tres grupos: núcleos caudales, mediales y dorsales (<a href="#fig-raphe" class="quarto-xref">Figure&nbsp;11</a>) <span class="citation" data-cites="huang2019">[@huang2019]</span>. Los núcleos mediales y dorsales tienen proyecciones hacia el , donde forman sinapsis con células granulares e interneuronas <span class="citation" data-cites="alenina2015">[@alenina2015]</span>.</p>
+<div id="fig-raphe" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-scap="Proyecciones serotoninérgicas de los núcleos de Rafé">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-raphe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/raphe.png" class="img-fluid figure-img" style="width:80.0%" data-fig-scap="Proyecciones serotoninérgicas de los núcleos de Rafé">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-raphe-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;11: Proyecciones serotoninérgicas de los núcleos de Rafé hacia áreas cerebrales involucradas en la regulación de la memoria y las emociones. La figura presenta una vista esquemática de los núcleos de Rafé y sus proyecciones serotoninérgicas en corte sagital de I) cerebro humano y II) cerebro de roedor. Se observa que los núcleos de Rafé están ubicados en el tronco encefálico. Desde estos núcleos, las fibras serotoninérgicas proyectan hacia diversas regiones: <strong>Corteza Prefrontal</strong>: Involucrada en funciones ejecutivas (p.&nbsp;ej. atención, recuperación de memorias) y regulación emocional. <strong>Hipotálamo</strong>: Importante en la regulación del estrés y las respuestas autónomas. <strong>Amígdala</strong>: Crítica para la formación de recuerdos emocionales (p.&nbsp;ej. miedo). <strong>Hipocampo</strong>: Fundamental para la formación y recuperación de memorias episódicas. <strong>Estriado</strong>: Implicado en la modulación de las funciones motoras y de recompensa. <strong>Área Tegmental Ventral</strong>: Relacionada con la recompensa y la motivación. Información tomada de: <span class="citation" data-cites="hornung2003">@hornung2003</span>; <span class="citation" data-cites="waselus2011">@waselus2011</span>; <span class="citation" data-cites="alenina2015">@alenina2015</span>; <span class="citation" data-cites="levinson2023">@levinson2023</span>
+</figcaption>
+</figure>
+</div>
+<p>La biosíntesis de implica la hidroxilación y descarboxilación del triptófano, un aminoácido esencial <span class="citation" data-cites="hale2011">[@hale2011]</span>. En un primer paso, el triptófano es convertido en mediante la enzima , la cual determina la tasa de producción de debido a su cinética constitutivamente lenta. En un segundo paso, el se convierte a a través de la acción de la enzima <span class="citation" data-cites="roth2021">[@roth2021]</span>. Esta regulación biosintética de la puede verse profundamente afectada por factores externos, como el estrés. Los niveles elevados de cortisol, como los observados durante el estrés crónico, provocan una disminución en los niveles de en el sistema nervioso <span class="citation" data-cites="chen2017b">[@chen2017b]</span>. Este efecto se debe a un mecanismo que involucra la -2 (<a href="#fig-tph2" class="quarto-xref">Figure&nbsp;12</a>) <span class="citation" data-cites="shimomura2019">[@shimomura2019]</span>, la isoforma de que se encuentra en las neuronas serotoninérgicas <span class="citation" data-cites="lowry2008">[@lowry2008]</span>.</p>
+<div>
+
+</div>
+<div class="quarto-layout-panel" data-layout="[45, -5, 45]">
+<div class="quarto-layout-row">
+<div id="first-column" class="quarto-layout-cell" style="flex-basis: 47.4%;justify-content: flex-start;">
+<div id="fig-tph2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-tph2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/tph2_estres.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-tph2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;12: Respuesta al Estrés y efectos del Cortisol sobre el sistema serotoninérgico del sistema nervioso.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-figure-spacer quarto-layout-cell" style="flex-basis: 5.3%;justify-content: flex-start;">
+<p>&nbsp;</p>
+</div>
+<div id="second-column" class="quarto-layout-cell" style="flex-basis: 47.4%;justify-content: flex-start;">
+<p>La figura ilustra cómo el estrés crónico activa la liberación de la y , elevando los niveles de cortisol. <span class="citation" data-cites="hale2011 chen2013">[@hale2011; @chen2013]</span>. El aumento sostenido de cortisol en el cuerpo tiene un efecto inhibidor sobre la actividad de la -2, reduciendo los niveles de en el cerebro <span class="citation" data-cites="shimomura2019">[@shimomura2019]</span>. La disminución de los niveles de está vinculada a la aparición de trastornos depresivos <span class="citation" data-cites="chen2017b">[@chen2017b]</span>. Información tomada de <span class="citation" data-cites="hale2011">@hale2011</span> y <span class="citation" data-cites="chen2013">@chen2013</span></p>
+</div>
+</div>
+</div>
+<p>Existe evidencia de que los fármacos antidepresivos modulan la actividad de la -2 y aumentan la disponibilidad de en el cerebro <span class="citation" data-cites="chen2017b">[@chen2017b]</span>. Además, se ha visto que la actividad de la -2 regula la y los comportamientos de tipo ansioso en un modelo murino <span class="citation" data-cites="kanai2009">[@kanai2009]</span>. Sin embargo, el mecanismo exacto entre la -2, la y los no se ha comprendido completamente <span class="citation" data-cites="song2016">[@song2016]</span>. Por un lado, los actúan a través del sistema serotoninérgico y promueven la <span class="citation" data-cites="malberg2000">[@malberg2000]</span>. Por otro lado, la disminución de está asociada con una reducción en el número de células recién generadas en el <span class="citation" data-cites="brezun1999">[@brezun1999]</span>. Los receptores serotoninérgicos 5-HT1A, 5-HT2B y 5-HT2C (<a href="#fig-neurogenesis" class="quarto-xref">Figure&nbsp;13</a>) son candidatos destacados para contribuir a la respuesta antidepresiva ya que regulan el desarrollo normal de la densidad de espinas dendríticas y la formación de sinapsis en las células granulares en el , y median la maduración de las células progenitoras <span class="citation" data-cites="alenina2015">[@alenina2015]</span>.</p>
+<div id="fig-neurogenesis" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-scap="Neurogénesis adulta y expresión de receptores de \ac{5-ht}" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-neurogenesis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/neurogenesis.png" class="img-fluid quarto-figure quarto-figure-center figure-img" data-fig-scap="Neurogénesis adulta y expresión de receptores de \ac{5-ht}">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-neurogenesis-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;13: Ciclo de neurogénesis adulta en el y expresión de receptores de . A) Diagrama del hipocampo mostrando el y la dinámica de la neurogénesis adulta <span class="citation" data-cites="denoth-lippuner2021">[@denoth-lippuner2021]</span>: se muestra la ubicación del y se ilustra el proceso de la , desde las células madre neurales hasta la integración de neuronas maduras en el circuito neural. <em>Células troncales neurales</em>: Localizadas en la capa subgranular, estas células proliferan y se diferencian en progenitores neuronales. <em>Neuroblastos</em>: En las siguientes semanas, los neuroblastos migran y se desarrollan en neuronas inmaduras. <em>Neuronas maduras</em>: Después de más de cuatro semanas, las neuronas maduras se integran en la región 3 del hipocampo, formando conexiones sinápticas funcionales. B) Expresión de diferentes receptores de en las células del durante su desarrollo y maduración <span class="citation" data-cites="song2016 batool2019">[@song2016; @batool2019]</span>: el receptor <em>5-HT1A</em> se expresa en las etapas tempranas de las células progenitoras; los receptores <em>5-HT2B</em> y <em>5-HT2C</em> se expresan en las células progenitoras; el receptor ionotrópico <em>5-HT3</em> se encuentra principalmente en las interneuronas del . Información tomada de <span class="citation" data-cites="alenina2015">@alenina2015</span> y <span class="citation" data-cites="song2016">@song2016</span>
+</figcaption>
+</figure>
+</div>
+<p>La interacción del sistema serotoninérgico con la también se refleja en estudios <em>post mortem</em> <span class="citation" data-cites="boldrini2009 boldrini2012 boldrini2013">[@boldrini2009; @boldrini2012; @boldrini2013]</span>, proporcionando un mayor entendimiento sobre el impacto de los antidepresivos en el cerebro. Estos estudios indican que los pacientes depresivos medicados con antidepresivos tienen más marcadores de NHA en comparación con pacientes no medicados. Finalmente, la flexibilidad cognitiva se beneficia de la plasticidad inducida por esta neurogénesis modulada por la <span class="citation" data-cites="burghardt2012 anacker2017 hurtubise2017 matias2017 marwari2018 doss2021">[@burghardt2012; @anacker2017; @hurtubise2017; @matias2017; @marwari2018; @doss2021]</span>. Bajo condiciones ambientales adecuadas (no aversivas) <span class="citation" data-cites="branchi2011 genet2013 carhart-harris2018 magaraggia2021 branchi2022 jacobsen2023">[@branchi2011; @genet2013; @carhart-harris2018; @magaraggia2021; @branchi2022; @jacobsen2023]</span>, esta plasticidad neuronal puede promover nuevas asociaciones y mejorar las distorsiones cognitivas (p.&nbsp;ej. <a href="AppendixB.qmd#term-id-70">rumiaciones</a>) <span class="citation" data-cites="mahar2014">[@mahar2014]</span> que perpetúan y agravan los trastornos de ansiedad y depresión <span class="citation" data-cites="guler2022">[@guler2022]</span>.</p>
+<div id="callout-ssri" class="callout callout-style-simple callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<strong>Fármacos Antidepresivos</strong>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Los primeros antidepresivos desarrollados fueron los inhibidores de la monoamino oxidasa, que mejoraban el ánimo a costa de efectos secundarios importantes, como toxicidad hepática y crisis hipertensivas <span class="citation" data-cites="lopez-munoz2009">[@lopez-munoz2009]</span>. Posteriormente, se desarrollaron los antidepresivos tricíclicos como la imipramina, que actúan principalmente bloqueando la recaptura de y noradrenalina. Debido a su falta de especificidad y efectos secundarios, los antidepresivos tricíclicos se prescriben actualmente para casos muy particulares de depresión <span class="citation" data-cites="hillhouse2015">[@hillhouse2015]</span>. A finales de los años 80, surgieron los antidepresivos de segunda generación, incluyendo los y los inhibidores de la recaptación de y noradrenalina <span class="citation" data-cites="hanson2011">[@hanson2011]</span>. Los , como el escitalopram, la fluoxetina y la sertralina, son los medicamentos más recetados para los trastornos de depresión y ansiedad <span class="citation" data-cites="lin2023">[@lin2023]</span>.</p>
+<p>Su mecanismo de acción inmediato es a través de la regularización del sistema serotoninérgico mediante el incremento de la concentración de en el espacio sináptico, a través de la inhibición de la recaptura de este neurotransmisor por el (<a href="#fig-ssri" class="quarto-xref">Figure&nbsp;14</a>). Sin embargo, se ha sugerido que su mecanismo de acción antidepresiva involucra el aumento en la <span class="citation" data-cites="santarelli2003 tunc-ozcan2019">[@santarelli2003; @tunc-ozcan2019]</span> que a su vez se ha relacionado con promover la flexibilidad cognitiva (<a href="#fig-flexneuro" class="quarto-xref">Figure&nbsp;8</a>; <a href="#fig-neurogenesis" class="quarto-xref">Figure&nbsp;13</a>) <span class="citation" data-cites="burghardt2012 marwari2018 maramis2021">[@burghardt2012; @marwari2018; @maramis2021]</span>. Como se mencionó antes (<a href="#sec-nha" class="quarto-xref">Section&nbsp;1.1.5</a>), esta flexibilidad mejora la capacidad para adaptarse a nuevas situaciones y experiencias, resultando en una reducción de síntomas depresivos y ansiosos y una mejora en el ánimo (<a href="#fig-flexibilidad" class="quarto-xref">Figure&nbsp;9</a>).</p>
+<div id="fig-ssri" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-scap="Mecanismo de acción de los fármacos antidepresivos clásicos">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ssri-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../Figures/ssri.png" class="img-fluid figure-img" style="width:90.0%" data-fig-scap="Mecanismo de acción de los fármacos antidepresivos clásicos">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ssri-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;14: Mecanismo de acción de los en la sinapsis. Se ilustra el mecanismo de acción de los , comparando una sinapsis sin la presencia de estos medicamentos (lado izquierdo, fondo rojo) con una sinapsis en presencia de (lado derecho, fondo azul). En la terminal presináptica, el triptófano (Trp) es convertido en por la acción de la . El se convierte en por la acción de la . <em>Sinapsis sin (lado izquierdo)</em>: La es almacenada en vesículas y liberada en la hendidura sináptica en respuesta a un potencial de acción. Parte de la liberada se une a los receptores de en la membrana postsináptica, facilitando la transmisión de la señal. La sobrante es recapturada en la terminal presináptica por el , reduciendo su disponibilidad en la sinapsis. <em>Sinapsis con (lado derecho)</em>: Los bloquean el en la terminal presináptica, impidiendo la recaptura de . Esto aumenta la disponibilidad de en la hendidura sináptica. La mayor concentración de permite una mayor interacción con los receptores de postsinápticos (5-HT-R), potenciando la transmisión de señales neuronales. Este mecanismo es fundamental para la eficacia terapéutica de los en el tratamiento de trastornos depresivos y de ansiedad, como se describe en los estudios de <span class="citation" data-cites="mahar2014">@mahar2014</span> y <span class="citation" data-cites="alenina2015">@alenina2015</span>. Figura basada en <span class="citation" data-cites="loke2021">@loke2021</span>
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

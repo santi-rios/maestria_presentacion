@@ -1,0 +1,17 @@
+# Objetivos e hipótesis {#sec-objetivos}
+
+## General
+
+Evaluar el impacto de la fluoxetina en la memoria espacial de ratones sometidos a estrés crónico moderado impredecible.
+
+### Específicos
+
+i.  Determinar el efecto del estrés crónico sobre la retención de memoria espacial remota y la flexibilidad cognitiva en un modelo de aprendizaje reversa.
+ii. Determinar el efecto de la fluoxetina sobre la retención de memoria espacial remota y el aprendizaje reversa.
+iii. Determinar si la fluoxetina es suficiente para aliviar las modificaciones a la retención y flexibildad de la memoria espacial causadas por el estrés cronico.
+
+
+
+## Hipótesis
+
+Si la fluoxetina puede aliviar los efectos emocionales negativos del estrés crónico, entonces podrá aliviar las modificaciones sobre la memoria remota espacial y la flexibilidad cognitiva. 

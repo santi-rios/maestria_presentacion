@@ -2,6 +2,19 @@ project:
   title: "Quarto rmarkdown presentacion"
   type: website
   output-dir: docs
+  # Asegura que estos recursos se copien a docs/
+  resources:
+    - Figures/
+    - plots/
+    - Chapters/
+    - README_files/
+    - style/
+    - data/
+    - R/
+    - apa-slide-presentation.csl
+    - title-slide-quarto-illinois.png
+    - zotero.bib
+    - zoterov3.bib
 format:
   html:
     theme: cerulean
@@ -20,8 +33,9 @@ format:
       fig-prefix: Fig
       title-delim: ".-" 
     toc: true
-    toc-depth: 1
+    toc-depth: 2
     toc-title: Contenido
+    scrollable: true
     transition: slide # fade/slide/convex/concave/zoom/none
     progress: true
     footnotes-hover: true
@@ -29,6 +43,7 @@ format:
     crossrefs-hover: true
     theme: "./style/custom.scss"
     css: ./style/style.css
+    self-contained: false
 author:
   - name: Biól. Garcia Rios Santiago
     affiliations:

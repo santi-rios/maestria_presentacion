@@ -1,0 +1,275 @@
+# Material y Métodos {#sec-metodologia}
+
+
+```{r setupmetodos}
+#| label: setup
+
+library(tidyverse)
+
+# Specify the file paths
+file_path_1 <- "../data/raw/animales_base_datos.csv"
+file_path_2 <- "./data/raw/animales_base_datos.csv"
+
+# TODO tratar de hacer con here::here("./data/...")
+
+
+# Try reading the file from the first location
+animales <- tryCatch(
+  read.csv(file_path_1),
+  error = function(e) {
+    # If an error occurs, read the file from the second location
+    read.csv(file_path_2)
+  }
+)
+
+```
+
+```{r baseDatosAnimales}
+#| label: descriptivaNuRatones
+
+# n total
+animales_n <- n_distinct(animales$ID) # ver unique y distinct
+
+# n por sexo
+animales_sexo <- animales %>% 
+    distinct(ID, sexo) %>% 
+    count(sexo) 
+
+animales_macho <- animales_sexo %>% 
+  filter(sexo == "Macho") %>% 
+  pull(n)
+
+animales_hembra <- animales_sexo %>%
+    filter(sexo == "Hembra") %>% 
+    pull(n)
+
+# n por grupo
+# animales_tratamientos <- animales %>% 
+#     distinct(ID, tratamiento) %>% 
+#     count(tratamiento) 
+
+
+# n grupos
+animales_fluoxetina_CUMS <- animales %>%
+  mutate(Estres = case_when(
+        tratamiento %in% c("CUMS_Fluox", "CUMS_ctrl", "CUMS_Salina", "Fluoxetina_CUMS") ~ "CUMS",
+        tratamiento %in% c("Fluoxetina", "Salina-Control") ~ "Control"
+      ),
+        Tratamiento.Farm = case_when(
+          tratamiento %in% c("Fluoxetina", "CUMS_Fluox", "Fluoxetina_CUMS") ~ "Fluoxetina",
+          tratamiento %in% c("CUMS_ctrl", "CUMS_Salina", "Salina-Control", "CUMS") ~ "Salina"
+      ) 
+      ) %>%
+  filter(Estres == "CUMS") %>% 
+  filter(Tratamiento.Farm == "Fluoxetina") %>% 
+  distinct(ID, Tratamiento.Farm) %>% 
+  count(Tratamiento.Farm) %>%
+  pull(n)
+
+animales_salina_CUMS <- animales %>%
+  mutate(Estres = case_when(
+        tratamiento %in% c("CUMS_Fluox", "CUMS_ctrl", "CUMS_Salina", "Fluoxetina_CUMS") ~ "CUMS",
+        tratamiento %in% c("Fluoxetina", "Salina-Control") ~ "Control"
+      ),
+        Tratamiento.Farm = case_when(
+          tratamiento %in% c("Fluoxetina", "CUMS_Fluox", "Fluoxetina_CUMS") ~ "Fluoxetina",
+          tratamiento %in% c("CUMS_ctrl", "CUMS_Salina", "Salina-Control", "CUMS") ~ "Salina"
+      ) 
+      ) %>%
+  filter(Estres == "CUMS") %>% 
+  filter(Tratamiento.Farm == "Salina") %>% 
+  distinct(ID, Tratamiento.Farm) %>% 
+  count(Tratamiento.Farm) %>%
+  pull(n)
+
+animales_fluoxetina_noCUMS <- animales %>%
+  mutate(Estres = case_when(
+        tratamiento %in% c("CUMS_Fluox", "CUMS_ctrl", "CUMS_Salina", "Fluoxetina_CUMS") ~ "CUMS",
+        tratamiento %in% c("Fluoxetina", "Salina-Control") ~ "Control"
+      ),
+        Tratamiento.Farm = case_when(
+          tratamiento %in% c("Fluoxetina", "CUMS_Fluox", "Fluoxetina_CUMS") ~ "Fluoxetina",
+          tratamiento %in% c("CUMS_ctrl", "CUMS_Salina", "Salina-Control", "CUMS") ~ "Salina"
+      ) 
+      ) %>%
+  filter(Estres == "Control") %>% 
+  filter(Tratamiento.Farm == "Fluoxetina") %>% 
+  distinct(ID, Tratamiento.Farm) %>% 
+  count(Tratamiento.Farm) %>%
+  pull(n)
+
+animales_salina_noCUMS <- animales %>%
+  mutate(Estres = case_when(
+        tratamiento %in% c("CUMS_Fluox", "CUMS_ctrl", "CUMS_Salina", "Fluoxetina_CUMS") ~ "CUMS",
+        tratamiento %in% c("Fluoxetina", "Salina-Control") ~ "Control"
+      ),
+        Tratamiento.Farm = case_when(
+          tratamiento %in% c("Fluoxetina", "CUMS_Fluox", "Fluoxetina_CUMS") ~ "Fluoxetina",
+          tratamiento %in% c("CUMS_ctrl", "CUMS_Salina", "Salina-Control", "CUMS") ~ "Salina"
+      ) 
+      ) %>%
+  filter(Estres == "Control") %>% 
+  filter(Tratamiento.Farm == "Salina") %>% 
+  distinct(ID, Tratamiento.Farm) %>% 
+  count(Tratamiento.Farm) %>%
+  pull(n)
+
+
+# TODO: case_when para sacar grupos de estrés y luego también contar por cada subrugpo
+
+```
+
+Se utilizaron `r animales_n - 1 -4` ratones de ambos sexos de la cruza *F1* C57BL/6 x BALB/c, de 8 semanas de edad al inicio del experimento. De estos animales, `r animales_macho -2` eran machos y `r animales_hembra + 3 - 2` eran hembras.
+
+Los ratones se alojaron en el bioterio de la Facultad de Ciencias en cajas de acrílico (`20cm * 30cm * 15cm`) en condiciones de temperatura controlada (`20°C - 25°C`), humedad relativa (`50 ± 10%`) con un ciclo de luz-oscuridad de 12 horas. Se les proporcionó agua y alimento ([5001 LabDiet para roedores](https://www.labdiet.com/getmedia/edc7a620-0240-4a7a-98fa-b3d69833f9ea/5001.pdf?ext=.pdf)) *ad libitum*. Todos los animales se proporcionaron por el bioterio de la Facultad de Ciencias de la UNAM con el código de oficio de la Comisión de Ética Académica y Responsabilidad Científica (CEARC) con Folio: `PI_25_05_2023_Canabal`.
+
+De acuerdo a los [protocolos de bienestar para el cuidado de roedores](https://nc3rs.org.uk/3rs-resources/housing-and-husbandry-mouse) [@prescott2017], se [evitó el manejo de los ratones por la cola](https://nc3rs.org.uk/3rs-resource-library/mouse-handling) por ser un estímulo aversivo, estresante y ansiogénico [@henderson2020; @gouveia2017; @gouveia2019]; se proporcionó refugio, cartón y papel triturado para construcción de nido [@andre2018]; se mantuvieron de 3 a 5 ratones del mismo sexo por caja [@demuyser2016] y se cambió de cama (aserrín comercial para roedores y ocote) 2 veces por semana [@hedrich2004].
+
+
+
+
+## Diseño experimental
+
+Se empleó un diseño experimental aleatorizado con dos grupos principales: grupo control (sin protocolo \ac{cums}, n= `r animales_fluoxetina_noCUMS + animales_salina_noCUMS - 4`) y grupo con protocolo \ac{cums} (n= `r animales_fluoxetina_CUMS + animales_salina_CUMS`). Cada uno de estos grupos se subdividió en dos subgrupos, uno tratado con fluoxetina (15 mg/kg/día, n= `r animales_fluoxetina_CUMS + animales_fluoxetina_noCUMS - 2`) y otro con solución salina (vehículo, n= `r animales_salina_CUMS + animales_salina_noCUMS - 2`). En resumen, los grupos experimentales fueron los siguientes:
+
+- **No-Estrés**
+  - \textcolor{orange}{Salina} (n= `r animales_salina_noCUMS - 2`)
+  - \textcolor{blue}{Fluoxetina} (n= `r animales_fluoxetina_noCUMS- 2`)
+- \textcolor{red}{\textbf{CUMS}}
+  - \textcolor{orange}{Salina} (n= `r animales_salina_CUMS`)
+  - \textcolor{blue}{Fluoxetina} (n= `r animales_fluoxetina_CUMS`)
+
+### Procedimiento
+
+![Línea del tiempo del procedimiento expimerntal a lo largo de 33 días.](../Figures/diseno_experimental.png){fig-align="center"}
+
+***Manipulación y habituación al cuarto de conducta***: Para reducir el estrés asociado con la manipulación de los ratones a un entorno nuevo, se implementó un protocolo de habituación dos semanas antes del inicio del experimento. Los ratones fueron manipulados cinco minutos diariamente en el cuarto de conducta donde se encuentra el \ac{mwm}. Este manejo consistió en sujetar a los ratones y permitirles explorar libremente las manos del experimentador.
+
+
+***Protocolo de Pre-entrenamiento en el \ac{mwm}***: Al termino de la fase de habituación, se realizó una prueba de aprendizaje sin pistas espaciales en el \ac{mwm} [@vorhees2006]. En este procedimiento, se colocan cortinas negras alrededor del laberinto para eliminar las señales distales del cuarto con el fin de interferir con la capacidad del animal para navegar el laberinto y encontrar la plataforma, que en esta fase se encuentra visible. Se utiliza una plataforma de acrílico con una "bandera" de plástico que se alza aproximadamente 7 cm por encima del agua. Esta señal permite al animal visualizar la ubicación de la plataforma y navegar hacia ella utilizando solamente su [memoria procedural](AppendixB.qmd#term-id-60). La localización de la plataforma se mantiene constante en el centro del \ac{mwm} durante los 4 ensayos que cada ratón intenta durante máximo 60 segundos. \todo{decir cuánto tiempo entre cada ensayo} Entre cada ensayo se daba un descanso de 30 segundos. El fin de este procedimiento es doble: reducir el estrés inicial del \ac{mwm} y asegurar que los animales no presenten deficiencias motoras y/o visuales que le impidan llegar a la plataforma.
+
+
+:::: {layout="[50, -2, 48]"}
+
+::: {#first-column}
+
+![Medidas del laberinto acuático de Morris utilizado. ](../Figures/WM_medidas.png){#fig-wmmedidas}
+
+:::
+
+::: {#second-column}
+
+El laberinto de fibra de vidrio tiene un diámetro total de 120 cm. El diámetro de la plataforma escondida (*annulus* blanco) es de de 10 cm y se mantiene 0.3 cm bajo el agua oscurecida con pintura témpera blanca. Alrededor de esta plataforma, se definió una 'zona' con un diámetro de 20 cm. El laberinto se divide en cuatro cuadrantes virtuales: noreste, noroeste, sureste y suroeste. Por último, se muestran las pistas espaciales colocadas a 65 cm de la superficie del laberinto acuático en cada uno de los puntos cardinales.
+
+:::
+
+::::
+
+***Aprendizaje espacial en el \ac{mwm} (MWM)***: Todos los grupos fueron entrenados en el laberinto con agua opcada a $25± 2 ℃$ durante cuatro días. Cada día se utilizaron 4 ubicaciones (norte, sur, este y oeste) de inicio semi-aleatorias con una duración máxima de 60 segundos por intento. Entre cada intento, los animales descansaban 30 segundos. Introducir a los animales desde posiciones distintas promueve la formación de estrategias espaciales ([alocéntricas](AppendixB.qmd#term-id-97)) [@othman2022], las cuales son modulados por el hipocampo [@dupret2008].
+
+***Retención de la memoria espacial en el MWM (Prueba-1)***:  El aprendizaje espacial es evaluado 24 horas después del último día del entrenamiento. En esta prueba, el ratón nada durante 60 segundos en el mismo laberinto, pero ahora sin la plataforma oculta. La adquisición de la memoria se evalúa con un porcentaje mayor de ocupación en el cuadrante (25% del área de la piscina) y la zona virtual (11% del área de la piscina) (@fig-wmmedidas). Estos porcentajes de ocupación se utilizaron como *criterios de inclusión en el experimento*.
+
+![Protocolo del Laberinto Acuático de Morris para Evaluar los Efectos del Estrés crónico en ratones. A) Configuración del laberinto con pistas visuales, una plataforma escondida, y sistemas de grabación para evaluar la navegación espacial de los ratones. B) Representación del entrenamiento desde el primer día hasta el último, seguido por una prueba de memoria sin plataforma para evaluar la retención de la memoria espacial inducida por el estrés.](../Figures/wm_overview_2.png){#fig-wm width="55%" fig-scap="Configuración y Protocolo del Laberinto de Morris"}
+
+***Inducción del Estrés Crónico y conductas de tipo depresivas***: Los ratones del grupo de estrés crónico fueron sometidos a un protocolo de \ac{cums} durante 21 días (ver calendario completo en @sec-cumCalendario). Este protocolo incluyó una variedad de estresores (@fig-cummin) basados en los protocolos de @monteiro2015 y @antoniuk2019 para generar estados de tipo depresivo-ansiosos, así como alteraciones en la dinámica hipocampal. 
+
+![Protocolo de \ac{cums} en Ratones para Inducir déficits cognitivos. Esta serie de imágenes ilustra los estresores que se utilizaron: 1) Privación de agua por hasta 8 horas; 2) Privación de comida por hasta 8 horas; 3) Cambios en el ciclo de luz-oscuridad; 4) Cama mojada (200 ml en 100 g de aserrín por hasta 19 horas); 5) Inclinación de la caja a 45 º por hasta 24 horas; 6) Levantamiento por cola máximo por cinco minutos; 7) Aislamiento social en cajas individuales.](../Figures/cums.png){#fig-cummin width="55%" fig-scap="Protocolo de Estrés Crónico Moderado Impredecible en Ratones"}
+
+***Tratamiento con Fluoxetina o Salina***: A la par del inicio del protocolo de \ac{cums}, los subgrupos correspondientes comenzaron a recibir una inyección subcutánea (s.c.) de fluoxetina (`15 mg/kg/día`) o solución salina (`0.85% NaCl`) con una jeringa de insulina (`31 G X 6 mm`). A pesar de que esta vía de administración es poco dolorosa y aversiva para los roedores [@hedrich2004], se alternó cada día (@fig-inyeccionessubcut) entre la región escapular (izquierda, derecha) y debajo de la nuca para reducir el estrés de la inyección. Esta vía de administración s.c. asegura el mantenimiento sostenido del fármaco al tener un ritmo de absorción lento, pero sostenido [@turner2011].
+
+:::: {layout="[45, -5, 45]"}
+
+::: {#first-column}
+
+![Esquema de tratamiento subcutáneo con fluoxetina o solución salina en los ratones.](../Figures/inyecciones.png){#fig-inyeccionessubcut width=55%}
+
+:::
+
+::: {#second-column}
+
+La figura ilustra el protocolo de administración subcutáneo (s.c.) con el objetivo de minimizar el estrés asociado al procedimiento de inyección diario. Para esto, se alternaba cada día el sitio de la inyección: *Región Escapular* Izquierda y Derecha y la región justo debajo de la *nuca* en la parte superior de la espalda del ratón.
+
+:::
+
+::::
+
+***Evaluación de la memoria espacial remota en el \ac{mwm} (Prueba-2)***: Una semana posterior al término del \ac{cums}, se evaluó la memoria remota mediante la evocación [@sara2000] de la memoria espacial. De manera similar a la prueba 1 (retención), se evaluó el porcentaje de ocupación en el cuadrante y la zona virtual  (@fig-wmmedidas).
+
+***Evaluación de la Flexibilidad Cognitiva por medio de entrenamientos y prueba reversa (Prueba-3) en el MWM:***: Un día después de la prueba de retención, se inició el protocolo de aprendizaje reversa en el MWM. Los paradigmas de aprendizaje reversa son una forma de analizar la flexibilidad cognitiva [@uddin2021; @vorhees2006]. De manera similar a la fase de aprendizaje espacial inicial, los ratones fueron entrenados por dos días desde las 4 posiciones para encontrar la plataforma escondida, pero ahora con la plataforma en una nueva localización en el cuadrante opuesto al original. La capacidad de reaprender la localización de la nueva plataforma se evaluó 24 horas después del último entrenamiento reversa en una prueba de 60 segundos donde se remueve la plataforma escondida y se analiza el tiempo en el cuadrante y zona [@epp2016].
+
+***Perfusión y Sacrificio de los sujetos***: 90 minutos posterior a la prueba reversa del MWM, se anestesiaron a los animales con pentobarbital sódico a una dosis letal por vía intraperitoneal (210 mg/kg i.p., diluido 1:3 en solución salina estéril al 0.85%). Tras asegurarnos que el animal no presentaba reflejos locomotores, se exponía la cavidad torácica para realizar la perfusión con 50 ml de solución de sacarosa al 10%, seguida de 50 ml de paraformaldehído al 3.7%. Los cerebros extraídos se almacenaron el mismo perfusato en refrigeración hasta su procesamiento histológico.
+
+
+## Análisis de datos
+
+Las coordenadas de los animales registradas fueron obtenidas con el programa de automatización de videos AnyMaze (versión 4.99). A partir de estas coordenadas se calcularon las distinas métricas de comportamiento en el \ac{mwm} mediante el paquete `Rtrack` [@overall2020]. Los datos fueron analizados y graficados utilizando el lenguaje R ([Versión 4.4.3](https://cran.r-project.org/bin/windows/base/)) por medio del software VScode ([Versión 1.97](https://code.visualstudio.com/download)).
+
+Para comparar las conductas en el \ac{mwm}, se utilizó un análisis de varianza de [medidas repetidas](AppendixB.qmd#term-id-80) (ANOVA) considerando dos factores con interacción en el modelo entre sujetos (*between-subjects*): el factor del **tratamiento** farmacológico (\textcolor{olive}{Salina}, \textcolor{blue}{Fluoxetina}) y el factor de **estrés** (Sin-estrés, \textcolor{red}{CUMS}). Adicionalmente, se tomó en cuenta factores dentro de sujetos (*within-subjects* o "medidas repetidas"): para el caso del análisis de la variable *latencia*, el factor *within* fue el tiempo; para el caso de las variables de *tiempo en cuadrante* y *tiempo en zona*, el factor *within* fue la categoría de *preferencia* por el cuadrante/zona (blanco *vs* opuestos). Debido a la incorporación de factores entre y dentro sujetos, se considera formalmente un *ANOVA de diseño mixto*. La variable *distancia media al blanco* fue analizada sin un factor *within* en un ANOVA de dos vías.
+
+Se utilizaron ANOVAs con suma de cuadrados tipo III (diseño no balanceado) y corrección de Greenhouse–Geisser en los factores *within* cuando se violaba el supuesto de esfericidad (`Mauchly < p.05`). El tamaño del efecto se calculo con el coeficiente $\eta^2$ [@olejnik2003], el cuál es recomendado para calcular el tamaño de efecto en diseños de medidas repetidas [@bakeman2005]. Para el correcto cálculo de $\eta^2$, se especificaron en cada caso las variables observadas (i.e. no manipuladas). En caso de detectar una interacción significativa, se realizaron comparaciones *post hoc* con el método de **Holm-Bonferroni** para comparaciones múltiples con el fin de determinar cuáles grupos diferían entre sí. Se consideró un nivel de significancia de `p < 0.05` para todas las pruebas.
+
+Con el fin de evaluar las tres pruebas en conjunto para analizar a detalle la adquisición, evocación y reaprendizaje de la memoria, se modeló el término de interacción `prueba x tratamiento x estrés` (modelar las medias y términos de errores a través del tiempo) [@deboer2015; @garofalo2022]. Es decir, determinamos la memoria de referencia y su evolución a través del tiempo en los distintos tratamientos [@tucker2018]. Para este análisis, utilizamos dos métricas altamente sensibles al aprendizaje espacial, la distancia media al *annulus* y la entropía [@maei2009; @maei2009a] y una métrica clásica, el tiempo de ocupación en la zona blanco. Para estos análisis se modelaron [regresiones lineales](AppendixB.qmd#term-id-82) con [efectos mixtos](AppendixB.qmd#term-id-71) (estimado usando [REML](AppendixB.qmd#term-id-83)) considerando los factores de `tratamiento` y `estrés` y la variable numérica correspondiente al número de la prueba (`1=prueba 1; 2=prueba 2 y 3 = reversa`). Se incluyó el identificador único del ratón como [variable aleatoria](AppendixB.qmd#term-id-72). Los modelos fueron realizados con el paquete de R `lme4` [@bates2015] y se determinó la significancia de las interacciones utilizando la prueba de [razón de verosimilitud](AppendixB.qmd#term-id-73) (*likelihood ratio*) para comparar el modelo sin el término de interacción ($H_0$) con el modelo completo ($H_a$). Se realizaron las comparaciones *post hoc* con el paquete `emmeans` ([medias marginales](AppendixB.qmd#term-id-74)) utilizando el método de Tukey para comparaciones múltiples. Se consideró un nivel de significancia de `p < 0.05` para todas las pruebas.
+
+Para calcular las estrategias de búsqueda se utilizó el paquete `Rtrack` [@overall2020]. Se agruparon las estrategias en 3 categorías:
+- **Estrategias [egocéntricas](AppendixB.qmd#term-id-98)**: tigmotaxis, circulación, búsqueda aleatoria, encadenamiento y exploración (@fig-estrategiasrandom y @fig-estrategiachaining).
+- **Estrategias [alocéntricas](AppendixB.qmd#term-id-97)**: búsqueda dirigida, búsqueda enfocada y nado directo (@fig-estrategiasalocentricas).
+- **Perseverancia**. Se considera aparte debido a la importancia de este fenómeno en la evaluación de la flexibilidad cognitiva. 
+
+Se analizaron los patrones de movimiento y las áreas de mayor permanencia de ratones en tres pruebas (retención, memoria remota y reversa) mediante la generación de mapas de densidad. Para ello, se utilizaron las coordenadas $x$ y $y$ obtenidas a 10 cuadros por segundo durante las pruebas del \ac{mwm}, las cuales se procesaron usando el \ac{kde} con un kernel gaussiano. Este método asigna mayor peso a los puntos cercanos y menor a los más distantes, permitiendo estimar la densidad de probabilidad de encontrar al ratón en un espacio continuo [@chen2017c].
+
+Para entender mejor la interacción entre variables categóricas (prueba, tipo de estrategia [cuenta] y tratamiento), ajustamos una regresión de [Poisson](AppendixB.qmd#term-id-77) (modelado tipo *inflación-cero*) con efectos mixtos (utilizando [máxima verosimilitud](AppendixB.qmd#term-id-78)). La variable de respuesta es el número de tipo de estrategias y las variables predictoras son el tiempo, tratamiento y estrés. Se incluyeron a los ratones como efectos mixtos para tomar en cuenta la dependencia de los datos en el tiempo (medidas repetidas). Para visualizar e interpretar los efectos estimados en este modelo, utilizamos las [medias marginales](AppendixB.qmd#term-id-74) para representan los valores esperados de la variable dependiente (en este caso, el número de estrategias observadas) para cada combinación de niveles de las variables categóricas, ajustados por el efecto de otras covariables incluidas en el modelo.
+
+## Entropía
+
+### Derivación de la fórmula de entropía
+
+A partir de la descripción de la derivación de entropía por @maei2009 y @dajun2003, se derivó este cálculo (utilizando el lenguaje de programación R) con los siguientes pasos:
+
+El cálculo de las distancias se obtuvo de las coordenadas del animal, las diferencias del animal al punto de referencia (*annulus* blanco), el cuadrado de la distancia Euclidiana, la distancia Euclidiana y el promedia de la distancia ($σ_d$). Con estos parámetros, se calculó la distancia del animal a la plataforma en cada tiempo utilizando la distancia Euclidiana tomando en cuenta las coordenadas del animal ($x_a, y_a$) y de la plataforma planco ($x_b, y_b$).
+
+\todo{Agregar el primer término al cuadrado en el texto:}
+
+$$
+d = \sqrt{(x_a - x_b)^2 + (y_a - y_b)^2}
+$$ 
+
+Las medias ponderadas y la matriz de varianza-covarianza se contruyó a partir de la matriz de covarianza que resulta de las medias ponderadas. La matriz de covarianza de valores [Eigen](AppendixB.qmd#term-id-89) se calcula para obtener la varianza $σ_a^2$ y $𝜎_b^2$. Con estos parámetros se calculó la varianza de los vectores de las distancias del animal respecto a la plataforma. La matriz de covarianza se representa como:
+
+$$
+Σ=\begin{pmatrix}
+Var(x) & Cov(x,y)\\
+Cov(x,y) & Var(y)
+\end{pmatrix}
+$$
+
+Donde `Var(x)` representa la varianza de las coordenadas X, `Var(y)` representa la varianza de las coordenadas Y, y `Cov(x,y)` representa la covarianza entre las coordenadas de X y Y. Esta matriz de covarianza resume cómo las coordenadas varían entre ellas. Si las coordenadas X y Y están altamente correlacionadas, la covarianza será alta, indicando una relación linear alta.
+
+Los ejes principales o valores Eigen son las direcciones en las que los datos varían más. Estos ejes se encontraron realizando una descomposición en valores propios de la matriz de covarianza. Los valores propios y los vectores propios obtenidos de esta descomposición tienen las siguientes intepretaciones:
+
+- *Valores Propios*: Representan la magnitud de la varianza a lo largo de los ejes principales.
+
+- *Vectores Propios*: Indican la dirección de estos ejes principales.
+
+Estos ejes pueden considerarse como los ejes mayor y menor de una elipse de error que mejor se ajusta a los datos. Los logaritmos de las varianzas se suman utilizando en el cálculo de la entropía para cuantificar la dispersión o el desorden de los datos en el plano, reflejando el producto de las varianzas a lo largo de los ejes principales
+
+El cálculo final de entropía se obtiene sumando los logaritmos de las medias cuadradas de la distancia y el producto de los valores Eigen. En resumen, calculamos $H_{error}$ basados en la fórmula $H_{error} = log(varianza_{distancia})$, calculamos la varianza de la trayectoria $var(X_a) + var(Y_a)$, calculamos la entropía de la trayectoria, realizamos la operación $H_{trayectoria} = log(var_{trayectoria})$ y finalmente calculamos la entropía total como $H_{total} = H_{error} + H_{trayectoria}$. En la @fig-plotentropia, se ilustra este proceso del cálculo de entropía.
+
+Para validar la métrica de entropía desarrollada en este estudio, se compararon los resultados obtenidos con nuestro método frente a los cálculos de entropía realizados con otras métricas clásicas del \ac{mwm}, obteniendo un coeficiente de correlación alto (r) entre ambas (@tbl-entropiacor). Sin embargo, la validación adicional de la métrica se realizó comparando nuestros resultados con los obtenidos por el cálculo de entropía original propuesto por @maei2009, el cual fue replicado en un estudio posterior por @cooke2020. Este último proporciona los datos crudos y rotulados de su experimento en un repositorio de Github, lo que permitió realizar un reanálisis de su experimento utilizando nuestro código de cálculo de entropía. Se analizaron un total de 141 pruebas del \ac{mwm} utilizando tanto el método de Cooke (basado en MATLAB) como el método propuesto en este estudio (basado en R). Las diferencias entre las entropías calculadas por ambos métodos fueron evaluadas mediante una prueba *t de Student* pareada.
+
+Para evaluar el acuerdo y la equivalencia entre las entropías calculadas por ambos métodos, se utilizó el análisis de **Bland-Altman** [@martinbland1986]. Este método evalúa la concordancia entre dos mediciones continuas, ya que no solo considera la correlación entre ellas, sino que también permite detectar posibles sesgos sistemáticos y visualizar los límites de acuerdo entre las dos metodologías. El análisis de Bland-Altman se realizó graficando la diferencia entre las entropías calculadas por ambos métodos frente al promedio de las dos medidas. Los límites de acuerdo se calculan como la diferencia media ± 1.96 veces la desviación estándar de las diferencias (con un intervalo de confianza del `95%`).
+
+
+### Desarrollo de aplicación interactiva para calcular entropía
+
+Se desarrolló una aplicación web interactiva para facilitar el cálculo de la entropía a partir de las coordenadas espaciales de los animales en el \ac{mwm}. La aplicación está disponible públicamente en [https://santi-rios.github.io/maestria_app_water_maze/](https://santi-rios.github.io/maestria_app_water_maze/). Esta herramienta permite la carga de archivos en formato CSV que contienen las coordenadas de los animales durante las pruebas, calcula la entropía a partir de dichas coordenadas y genera un gráfico que ilustra el cálculo.
+
+La aplicación fue desarrollada utilizando el paquete [Shiny](https://shiny.rstudio.com/) de [R](https://www.r-project.org/), un marco para el desarrollo de aplicaciones web interactivas, que permite la manipulación de datos y la generación de gráficos de manera dinámica. La aplicación cuenta con una interfaz simple e intuitiva que permite al usuario cargar un archivo CSV con las coordenadas de las trayectorias de los animales. Además, el usuario puede ajustar manualmente los parámetros necesarios para el cálculo de la entropía, como las coordenadas de la plataforma objetivo (en el formato *x*, *y*), las coordenadas centrales del aparato, y el radio del área de análisis (annulus). 
+
+Una vez que se han ingresado los datos y parámetros, el usuario puede hacer clic en el botón "Calcular H" para realizar el cálculo de entropía. Los resultados se presentan en una **Tabla de resultados** que muestra la entropía calculada y un **gráfico ilustrativo** que muestra las trayectorias del animal alrededor del annulus, la ubicación de la plataforma, y la relación espacial entre los puntos de la trayectoria y la plataforma objetivo. 
+
+El código completo de la aplicación está disponible en el repositorio asociado y está desarrollado utilizando los paquetes de R `shiny` para la interfaz web, `dplyr` y `janitor` para la manipulación de datos, y `car` para el cálculo de la función elíptica que forma parte del proceso de cálculo de la entropía. La @fig-entropiaApp muestra la interfaz de la aplicación, la cual permite una fácil interacción con los datos para el análisis de entropía en el MWM.
+
+
+## Descripción general de los sujetos experimentales
+
+En el @sec-descgeneral se puede encontrar más información general sobre los sujetos experimentales, como un resumen descriptivo de las variables analizadas, su distribucuón (histogramas) y el peso de los ratones a lo largo del experimento.
